@@ -172,17 +172,17 @@ try {
 
 | アサーション | 確認する内容 |
 | --- | --- |
-| `assertSelectorExists($selector)`, `assertSelectorNotExists($selector)` | 一致する要素があること |
+| `assertSelectorExists($selector)`、`assertSelectorNotExists($selector)` | 一致する要素があること |
 | `assertSelectorCount($count, $selector)` | 一致する要素の数 |
-| `assertSelectorTextContains($selector, $text)`, `assertSelectorTextNotContains()`, `assertSelectorTextSame()` | 最初に一致した要素の表示されているテキスト |
-| `assertPageTitleSame($title)`, `assertPageTitleContains($title)` | `<title>` |
-| `assertInputValueSame($name, $value)`, `assertInputValueNotSame()` | フィールドの現在の値。名前で指定します。例: `data[Article][title]` |
-| `assertCheckboxChecked($name)`, `assertCheckboxNotChecked($name)` | チェックボックス。名前で指定します |
-| `assertBrowserHasCookie($name)`, `assertBrowserNotHasCookie($name)`, `assertBrowserCookieValueSame($name, $value)` | ブラウザーの Cookie |
-| `assertSelectorIsVisible($locator)`, `assertSelectorIsNotVisible()` | 最初に一致した要素が表示されているかどうか |
-| `assertSelectorIsEnabled($locator)`, `assertSelectorIsDisabled()` | 有効かどうか |
-| `assertSelectorAttributeContains($locator, $attribute, $text)`, `assertSelectorAttributeNotContains()` | 属性。`$text = null` は属性が設定されていないことを確認します |
-| `assertSelectorWillExist()`, `assertSelectorWillNotExist()`, `assertSelectorWillBeVisible()`, `assertSelectorWillNotBeVisible()`, `assertSelectorWillContain()`, `assertSelectorWillNotContain()`, `assertSelectorWillBeEnabled()`, `assertSelectorWillBeDisabled()`, `assertSelectorAttributeWillContain()`, `assertSelectorAttributeWillNotContain()` | 上と同じ内容を、そうなるまで待ってから確認します (Panther の `waitFor*()`) |
+| `assertSelectorTextContains($selector, $text)`、`assertSelectorTextNotContains()`、`assertSelectorTextSame()` | 最初に一致した要素の表示されているテキスト |
+| `assertPageTitleSame($title)`、`assertPageTitleContains($title)` | `<title>` |
+| `assertInputValueSame($name, $value)`、`assertInputValueNotSame()` | フィールドの現在の値。名前で指定します。例: `data[Article][title]` |
+| `assertCheckboxChecked($name)`、`assertCheckboxNotChecked($name)` | チェックボックス。名前で指定します |
+| `assertBrowserHasCookie($name)`、`assertBrowserNotHasCookie($name)`、`assertBrowserCookieValueSame($name, $value)` | ブラウザーの Cookie |
+| `assertSelectorIsVisible($locator)`、`assertSelectorIsNotVisible()` | 最初に一致した要素が表示されているかどうか |
+| `assertSelectorIsEnabled($locator)`、`assertSelectorIsDisabled()` | 有効かどうか |
+| `assertSelectorAttributeContains($locator, $attribute, $text)`、`assertSelectorAttributeNotContains()` | 属性。`$text = null` は属性が設定されていないことを確認します |
+| `assertSelectorWillExist()`、`assertSelectorWillNotExist()`、`assertSelectorWillBeVisible()`、`assertSelectorWillNotBeVisible()`、`assertSelectorWillContain()`、`assertSelectorWillNotContain()`、`assertSelectorWillBeEnabled()`、`assertSelectorWillBeDisabled()`、`assertSelectorAttributeWillContain()`、`assertSelectorAttributeWillNotContain()` | 上と同じ内容を、そうなるまで待ってから確認します (Panther の `waitFor*()`) |
 
 Symfony のレスポンスのアサーション (`assertResponseIsSuccessful()` など) はありません。WebDriver は
 ステータスコードを公開しないためです。これらには `IntegrationTestTrait` を使ってください。
@@ -221,11 +221,11 @@ PANTHER_NO_HEADLESS=1 vendor/bin/phpunit --testsuite EndToEnd --debug
 | `static createAdditionalPantherClient()` | 別の独立したブラウザー (Panther) |
 | `static createHttpBrowserClient(array $options = [])` | HTTP を通して動く、JavaScript なしのクライアント (Panther) |
 | `static startWebServer(array $options = [])` | CakePHP 向けのデフォルトで Web サーバーを起動します。その後は Panther と同じ動作です |
-| `static stopWebServer()`, `static isWebServerStarted()` | Panther |
+| `static stopWebServer()`、`static isWebServerStarted()` | Panther |
 | `static defaultWebServerDir(?string $projectRoot = null)` | プロジェクトの `webroot/` または `app/webroot/` (protected) |
 | `tearDown()` | `CakeTestCase::tearDown()` の後、失敗したテストのスクリーンショットを保存します |
 | `ROUTER` | CakePHP のルータースクリプトのパス |
-| `CHROME`, `FIREFOX`, `SELENIUM` | `browser` オプションの値 |
+| `CHROME`、`FIREFOX`、`SELENIUM` | `browser` オプションの値 |
 
 <a id="webtestassertionstrait"></a>
 

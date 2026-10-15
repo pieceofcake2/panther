@@ -80,7 +80,7 @@ PANTHER_WEB_SERVER_PORT=9180 vendor/bin/phpunit --testsuite EndToEnd
 | `PANTHER_NO_SANDBOX` | Chrome のサンドボックスを無効にします (コンテナ、CI) |
 | `PANTHER_CHROME_ARGUMENTS` | Chrome の追加の引数。スペースで区切ります。例: `--lang=ja --window-size=1600,1200` |
 | `PANTHER_CHROME_BINARY` | 使用する Chrome のバイナリ |
-| `PANTHER_FIREFOX_ARGUMENTS`, `PANTHER_FIREFOX_BINARY` | Firefox 用の同じ設定 |
+| `PANTHER_FIREFOX_ARGUMENTS`、`PANTHER_FIREFOX_BINARY` | Firefox 用の同じ設定 |
 
 <a id="createpantherclient-options"></a>
 
