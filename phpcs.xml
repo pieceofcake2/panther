@@ -1,0 +1,73 @@
+<?xml version="1.0"?>
+<ruleset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="vendor/squizlabs/php_codesniffer/phpcs.xsd">
+    <config name="php_version" value="80000"/>
+
+    <arg value="ps"/>
+    <arg name="colors"/>
+    <arg name="parallel" value="16"/>
+    <arg name="extensions" value="php,ctp"/>
+
+    <file>docs/examples</file>
+    <file>resources</file>
+    <file>src</file>
+    <file>tests</file>
+
+    <rule ref="CakePHP">
+        <!-- ===== Formatting Rules ===== -->
+        <!-- Exclude line length checks (consistent with the other pieceofcake2 packages) -->
+        <exclude name="Generic.Files.LineLength"/>
+    </rule>
+
+    <!-- Include additional whitespace checking rule -->
+    <rule ref="Generic.Formatting.MultipleStatementAlignment">
+        <properties>
+            <property name="maxPadding" value="1"/>
+        </properties>
+    </rule>
+
+    <!-- The fixture applications, the router script and the examples are CakePHP 2 code in the global namespace -->
+    <rule ref="PSR1.Classes.ClassDeclaration.MissingNamespace">
+        <exclude-pattern>docs/examples/*</exclude-pattern>
+        <exclude-pattern>tests/test_app/*</exclude-pattern>
+        <exclude-pattern>tests/test_app_legacy/*</exclude-pattern>
+    </rule>
+    <rule ref="PSR1.Files.SideEffects.FoundWithSymbols">
+        <exclude-pattern>docs/examples/*</exclude-pattern>
+        <exclude-pattern>resources/*</exclude-pattern>
+        <exclude-pattern>tests/test_app/*</exclude-pattern>
+        <exclude-pattern>tests/test_app_legacy/*</exclude-pattern>
+    </rule>
+    <rule ref="SlevomatCodingStandard.TypeHints.PropertyTypeHint">
+        <exclude-pattern>docs/examples/*</exclude-pattern>
+        <exclude-pattern>tests/test_app/*</exclude-pattern>
+        <exclude-pattern>tests/test_app_legacy/*</exclude-pattern>
+    </rule>
+    <rule ref="SlevomatCodingStandard.TypeHints.DeclareStrictTypes.DeclareStrictTypesMissing">
+        <exclude-pattern>docs/examples/*</exclude-pattern>
+        <exclude-pattern>resources/*</exclude-pattern>
+        <exclude-pattern>tests/test_app/*</exclude-pattern>
+        <exclude-pattern>tests/test_app_legacy/*</exclude-pattern>
+        <exclude-pattern>tests/test_static/*</exclude-pattern>
+        <exclude-pattern>tests/bootstrap.php</exclude-pattern>
+    </rule>
+    <!-- CakePHP 2 conventions: DATABASE_CONFIG and $_schema -->
+    <rule ref="Squiz.Classes.ValidClassName.NotPascalCase">
+        <exclude-pattern>tests/test_app/config/database.php</exclude-pattern>
+    </rule>
+    <rule ref="Squiz.Classes.ClassFileName.NoMatch">
+        <exclude-pattern>tests/test_app/config/database.php</exclude-pattern>
+    </rule>
+    <rule ref="PSR2.Classes.PropertyDeclaration.Underscore">
+        <exclude-pattern>tests/test_app/*</exclude-pattern>
+    </rule>
+
+    <rule ref="CakePHP.Commenting.FunctionComment.Missing">
+        <exclude-pattern>tests/TestCase/*</exclude-pattern>
+    </rule>
+
+    <!-- Require return type hints for tests/TestCase only -->
+    <rule ref="SlevomatCodingStandard.TypeHints.ReturnTypeHint.MissingNativeTypeHint">
+        <include-pattern>tests/TestCase/*</include-pattern>
+    </rule>
+</ruleset>

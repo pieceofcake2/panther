@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
+         bootstrap="tests/bootstrap.php"
+         backupGlobals="true"
+         stderr="true"
+         colors="true">
+    <php>
+        <ini name="memory_limit" value="-1"/>
+        <!-- Symfony Panther and pieceofcake2/panther read these from $_SERVER -->
+        <server name="PANTHER_WEB_SERVER_DIR" value="./tests/test_app/webroot"/>
+        <server name="PANTHER_APP_DATASOURCE" value="test"/>
+        <server name="PANTHER_ERROR_SCREENSHOT_DIR" value="./tmp/error-screenshots"/>
+    </php>
+    <extensions>
+        <extension class="PieceOfCake2\Panther\ServerExtension"/>
+    </extensions>
+    <listeners>
+        <listener class="CakeFixtureInjector" file="vendor/pieceofcake2/cakephp/src/Cake/TestSuite/Fixture/CakeFixtureInjector.php"/>
+    </listeners>
+    <testsuites>
+        <testsuite name="Unit">
+            <directory>tests/TestCase</directory>
+            <exclude>tests/TestCase/EndToEnd</exclude>
+        </testsuite>
+        <testsuite name="EndToEnd">
+            <directory>tests/TestCase/EndToEnd</directory>
+        </testsuite>
+    </testsuites>
+    <coverage>
+        <include>
+            <directory suffix=".php">src</directory>
+        </include>
+    </coverage>
+</phpunit>

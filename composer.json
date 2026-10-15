@@ -1,0 +1,39 @@
+{
+    "name": "pieceofcake2/panther",
+    "description": "End-to-End tests for CakePHP 2 applications with Symfony Panther and PHPUnit",
+    "type": "library",
+    "keywords": ["cakephp", "cakephp2", "panther", "end-to-end", "e2e", "testing", "phpunit", "fixtures", "chrome", "webdriver"],
+    "license": "MIT",
+    "homepage": "https://pieceofcake2.github.io/panther/",
+    "require": {
+        "php": ">=8.0",
+        "ext-dom": "*",
+        "phpunit/phpunit": "^9.6",
+        "pieceofcake2/cakephp": "^2.12",
+        "symfony/panther": "^2.1.1"
+    },
+    "require-dev": {
+        "cakephp/cakephp-codesniffer": "^5.0",
+        "phpstan/phpstan": "^2.1",
+        "pieceofcake2/phpstan-cakephp2": "^0.2.3"
+    },
+    "suggest": {
+        "dbrekelmans/bdi": "Downloads a chromedriver that matches the installed Chrome into drivers/, where Panther finds it (vendor/bin/bdi detect drivers)"
+    },
+    "autoload": {
+        "psr-4": {
+            "PieceOfCake2\\Panther\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "PieceOfCake2\\Panther\\Test\\": "tests/TestCase/"
+        }
+    },
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": {
+            "dealerdirect/phpcodesniffer-composer-installer": true
+        }
+    }
+}

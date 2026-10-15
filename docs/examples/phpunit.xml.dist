@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="./vendor/phpunit/phpunit/phpunit.xsd"
+         bootstrap="./tests/bootstrap.php"
+         backupGlobals="true"
+         defaultTestSuite="App"
+         stderr="true"
+         colors="true">
+    <php>
+        <ini name="memory_limit" value="-1"/>
+        <!-- The web server uses the test datasource, where the fixtures are -->
+        <server name="PANTHER_APP_DATASOURCE" value="test"/>
+        <!-- Screenshots of the failed End-to-End tests -->
+        <server name="PANTHER_ERROR_SCREENSHOT_DIR" value="./tmp/error-screenshots"/>
+    </php>
+    <extensions>
+        <extension class="PieceOfCake2\Panther\ServerExtension"/>
+    </extensions>
+    <listeners>
+        <listener class="CakeFixtureInjector" file="./vendor/pieceofcake2/cakephp/src/Cake/TestSuite/Fixture/CakeFixtureInjector.php"/>
+    </listeners>
+    <testsuites>
+        <testsuite name="App">
+            <directory>./tests/TestCase/</directory>
+            <exclude>./tests/TestCase/EndToEnd/</exclude>
+        </testsuite>
+        <testsuite name="EndToEnd">
+            <directory>./tests/TestCase/EndToEnd/</directory>
+        </testsuite>
+    </testsuites>
+</phpunit>
