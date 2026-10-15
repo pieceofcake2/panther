@@ -51,6 +51,13 @@ jobs:
       - name: Install chromedriver for the installed Chrome
         run: vendor/bin/bdi detect drivers
 
+      # The runners have no Japanese fonts; without them Japanese text is drawn as boxes in the screenshots
+
+      - name: Install Japanese fonts
+
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq fonts-noto-cjk
+
+
       - name: Run End-to-End tests
         env:
           DB_TEST_DATASOURCE: Database/Mysql
@@ -84,4 +91,4 @@ jobs:
 ```
 
 `bdi` is [dbrekelmans/bdi](https://github.com/dbrekelmans/bdi); add it with
-`composer require --dev dbrekelmans/bdi`. `PANTHER_NO_SANDBOX=1` is needed on the GitHub runners.
+`composer require --dev dbrekelmans/bdi`. `PANTHER_NO_SANDBOX=1` is needed on the GitHub runners. The runners have no Japanese (CJK) fonts, so the example installs `fonts-noto-cjk`; without it, Japanese text is drawn as boxes in the screenshots. Leave the step out if your pages have no CJK text.
