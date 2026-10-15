@@ -4,7 +4,7 @@
 
 ## テストケース
 
-テストは `tests/TestCase/EndToEnd/` (レガシーレイアウトでは `app/Test/Case/EndToEnd/`) に置き、
+テストは `tests/TestCase/EndToEnd/` (レガシー構成では `app/Test/Case/EndToEnd/`) に置き、
 `PantherTestCase` を継承します ([docs/examples/ArticlesTest.php](../examples/ArticlesTest.php))。
 
 ```php

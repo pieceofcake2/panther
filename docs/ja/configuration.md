@@ -123,7 +123,7 @@ Panther のものです。
 
 <a id="modern-and-legacy-layouts"></a>
 
-### モダンレイアウトとレガシーレイアウト
+### モダン構成とレガシー構成
 
 ドキュメントルートは、プロジェクトの `webroot/` (pieceofcake2/app) です。`app/webroot/` しかない場合は
 そちらを使います (従来の CakePHP 2 のスケルトン)。プロジェクトとは Composer のルートパッケージです。
