@@ -98,7 +98,7 @@ pieceofcake2/app には、すでにこの設定が含まれています。
 ## 由来
 
 このパッケージは [pieceofcake2](https://github.com/pieceofcake2) が作成し、メンテナンスしています。
-ほかのプロジェクトのフォークではなく、ほかのプロジェクトをベースにしたものでもありません。
+他のプロジェクトのフォークではなく、他のプロジェクトをもとにしたものでもありません。
 Composer の依存パッケージとして [Symfony Panther](https://github.com/symfony/panther) の上に構築されており、
 pieceofcake2/e2e-test を置き換えるものです。
 
