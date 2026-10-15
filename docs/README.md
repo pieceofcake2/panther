@@ -81,7 +81,7 @@ Add `/drivers/` to `.gitignore`.
 
    Delete `defaultTestSuite="App"` to make `vendor/bin/phpunit` run everything, as in a Symfony application.
 
-pieceofcake2/app already has this configuration.
+pieceofcake2/app is being updated to this configuration.
 
 ## Origin
 
