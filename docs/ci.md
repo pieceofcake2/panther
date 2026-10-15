@@ -53,11 +53,7 @@ jobs:
 
       - name: Run End-to-End tests
         env:
-          DB_TEST_DATASOURCE: Database/Mysql
-          DB_TEST_HOST: 127.0.0.1
-          DB_TEST_USERNAME: root
-          DB_TEST_PASSWORD: root
-          DB_TEST_DATABASE: test_app
+          DATABASE_TEST_URL: mysql://root:root@127.0.0.1:3306/test_app
           PANTHER_NO_SANDBOX: 1
         run: vendor/bin/phpunit --testsuite EndToEnd --log-junit end-to-end-junit.xml
 
@@ -83,3 +79,6 @@ jobs:
 
 `bdi` is [dbrekelmans/bdi](https://github.com/dbrekelmans/bdi); add it with
 `composer require --dev dbrekelmans/bdi`. `PANTHER_NO_SANDBOX=1` is needed on the GitHub runners.
+`DATABASE_TEST_URL` sets the `test` connection of pieceofcake2/app's `config/database.php` (with the
+release of pieceofcake2/cakephp after 2.12.6), which the web server uses as `default`; see
+[Test Database](test-database.md).

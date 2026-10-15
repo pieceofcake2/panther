@@ -12,13 +12,17 @@ Web サーバーに環境変数 `APP_ENV=test` を渡します。`APP_ENV` が `
 ```php
 public function __construct()
 {
+    $this->default['dsn'] = env('DATABASE_URL');
+    $this->test['dsn'] = env('DATABASE_TEST_URL');
+
     if (env('APP_ENV') === 'test') {
         $this->default = $this->test;
     }
 }
 ```
 
-pieceofcake2/app の `config/database.php.default` にはこの行があります。テスト用のデータソースは、
+pieceofcake2/app の `config/database.php.default` にはこの行があります。`'dsn'` キーは、環境変数
+`DATABASE_URL` と `DATABASE_TEST_URL` から接続を設定します。テスト用のデータソースは、
 両方のプロセスから開けるデータベースでなければなりません。つまり、データベースサーバーか SQLite の
 ファイルで、`:memory:` は使えません。
 
@@ -32,4 +36,8 @@ pieceofcake2/app の `config/database.php.default` にはこの行がありま�
 
 Web サーバーは、テストのプロセスの環境変数を引き継ぎます。シェルの環境変数と、`$_ENV` または
 `$_SERVER` にある変数です (Symfony Process は `putenv()` だけで設定された変数を渡しません)。
-pieceofcake2/app の `DB_TEST_*` 変数は、この方法で Web サーバーに渡されます。
+pieceofcake2/app の `DATABASE_TEST_URL` 変数は、この方法で Web サーバーに渡されます。たとえば
+`DATABASE_TEST_URL="mysql://root:root@127.0.0.1:3306/test_app"` や、両方のプロセスが開く SQLite ファイルなら
+`DATABASE_TEST_URL="sqlite:///tmp/tests/end_to_end.sqlite"` (プロジェクトルートからの相対パス) のように設定します。
+これを読み込む `'dsn'` キーには、2.12.6 の次のリリース以降の pieceofcake2/cakephp が必要です。以前のスケルトンから
+作成したアプリケーションでは、代わりに `DB_TEST_*` 変数を設定します。

@@ -54,11 +54,7 @@ jobs:
 
       - name: Run End-to-End tests
         env:
-          DB_TEST_DATASOURCE: Database/Mysql
-          DB_TEST_HOST: 127.0.0.1
-          DB_TEST_USERNAME: root
-          DB_TEST_PASSWORD: root
-          DB_TEST_DATABASE: test_app
+          DATABASE_TEST_URL: mysql://root:root@127.0.0.1:3306/test_app
           PANTHER_NO_SANDBOX: 1
         run: vendor/bin/phpunit --testsuite EndToEnd --log-junit end-to-end-junit.xml
 
@@ -85,3 +81,6 @@ jobs:
 `bdi` は [dbrekelmans/bdi](https://github.com/dbrekelmans/bdi) です。
 `composer require --dev dbrekelmans/bdi` で追加してください。GitHub のランナーでは
 `PANTHER_NO_SANDBOX=1` が必要です。
+`DATABASE_TEST_URL` は pieceofcake2/app の `config/database.php` の `test` 接続を設定し (2.12.6 の次のリリース以降の
+pieceofcake2/cakephp が必要です)、Web サーバーはそれを `default` として使います。
+[テスト用データベース](test-database.md) をご覧ください。
