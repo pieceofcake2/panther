@@ -79,7 +79,7 @@ $client->takeScreenshot('tmp/articles.png');
 
 クライアントは BrowserKit のクライアントで、クローラーは要素が WebDriver の要素である DomCrawler の
 クローラーです。[Panther のドキュメント](https://symfony.com/doc/current/testing/end_to_end.html#usage)
-を参照してください。
+をご覧ください。
 
 <a id="forms"></a>
 

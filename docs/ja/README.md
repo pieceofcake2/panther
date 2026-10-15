@@ -106,4 +106,4 @@ pieceofcake2/e2e-test を置き換えるものです。
 
 ## ライセンス
 
-MIT ライセンスです。[LICENSE](../../LICENSE) を参照してください。
+MIT ライセンスです。[LICENSE](../../LICENSE) をご覧ください。
