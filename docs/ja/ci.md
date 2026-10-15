@@ -63,6 +63,7 @@ jobs:
         run: vendor/bin/phpunit --testsuite EndToEnd --log-junit end-to-end-junit.xml
 
       - name: Upload the error screenshots
+        id: screenshots
         if: ${{ failure() }}
         uses: actions/upload-artifact@v7
         with:
@@ -79,6 +80,7 @@ jobs:
           title: End-to-End
           file: end-to-end-junit.xml
           artifact-name: error-screenshots
+          artifact-url: ${{ steps.screenshots.outputs.artifact-url }}
           artifact-note: Screenshots of the failed tests are in the {artifact} artifact.
 ```
 
