@@ -66,20 +66,33 @@ jobs:
       - name: Setup problem matchers for PHPUnit
         run: echo "::add-matcher::${{ runner.tool_cache }}/phpunit.json"
 
+      - name: Run unit tests
+        run: ./vendor/bin/phpunit --testsuite Unit --coverage-clover coverage-unit.xml --log-junit junit-unit.xml --colors=always
+
       # Chrome and chromedriver of the runner image
-      - name: Run Tests
+      - name: Run End-to-End tests
+        if: ${{ !cancelled() }}
         env:
           PANTHER_NO_SANDBOX: 1
-        run: ./vendor/bin/phpunit --testsuite Unit,EndToEnd --coverage-clover coverage.xml --log-junit junit.xml --colors=always
+        run: ./vendor/bin/phpunit --testsuite EndToEnd --coverage-clover coverage-end-to-end.xml --log-junit junit-end-to-end.xml --colors=always
 
-      - name: Test summary
+      - name: Unit test summary
         if: ${{ !cancelled() }}
         uses: pieceofcake2/ci-summary@v1
         with:
           type: junit
-          title: PHPUnit — PHP ${{ matrix.php-version }}
-          file: junit.xml
-          coverage: coverage.xml
+          title: Unit tests — PHP ${{ matrix.php-version }}
+          file: junit-unit.xml
+          coverage: coverage-unit.xml
+
+      - name: End-to-End test summary
+        if: ${{ !cancelled() }}
+        uses: pieceofcake2/ci-summary@v1
+        with:
+          type: junit
+          title: End-to-End tests — PHP ${{ matrix.php-version }}
+          file: junit-end-to-end.xml
+          coverage: coverage-end-to-end.xml
           artifact-name: error-screenshots-php${{ matrix.php-version }}
           artifact-note: Screenshots of the failed tests are in the {artifact} artifact.
 
@@ -98,7 +111,7 @@ jobs:
         with:
           report_type: test_results
           use_oidc: true
-          files: ./junit.xml
+          files: ./junit-unit.xml,./junit-end-to-end.xml
           flags: php${{ matrix.php-version }}
           name: PHP ${{ matrix.php-version }}
 
@@ -106,6 +119,7 @@ jobs:
         uses: codecov/codecov-action@v7
         with:
           use_oidc: true
+          files: ./coverage-unit.xml,./coverage-end-to-end.xml
           flags: php${{ matrix.php-version }}
           name: PHP ${{ matrix.php-version }}
 
@@ -114,7 +128,7 @@ jobs:
         with:
           oidc: true
           command: publish
-          files: coverage.xml
+          files: coverage-*.xml
           format: clover
           incomplete: true
           name: PHP ${{ matrix.php-version }}
