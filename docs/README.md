@@ -23,7 +23,7 @@ its `PantherTestCase` starts the application with PHP's built-in web server and 
 | The assertions of `WebTestAssertionsTrait` | `PieceOfCake2\Panther\TestSuite\WebTestAssertionsTrait`, the same assertions without the Symfony FrameworkBundle |
 | `PANTHER_WEB_SERVER_DIR` defaults to `public/` | defaults to `webroot/` (or `app/webroot/`) |
 | `PANTHER_WEB_SERVER_ROUTER` defaults to none | defaults to the [CakePHP router script](configuration.md#the-cakephp-router-script) |
-| `PANTHER_APP_ENV` sets `APP_ENV` of the web server | `PANTHER_APP_DATASOURCE` sets `APP_DATASOURCE` of the web server |
+| `PANTHER_APP_ENV=test` makes the web server load `.env.test` | `PANTHER_APP_ENV=test` makes `config/database.php` use the `test` datasource |
 
 Everything else is Panther's own: the `Client` (`request()`, `clickLink()`, `submitForm()`, `waitFor()`,
 `takeScreenshot()` ...), `createPantherClient()` and its options, and the `PANTHER_*` environment variables.
@@ -59,7 +59,7 @@ Add `/drivers/` to `.gitignore`.
 
    ```xml
    <php>
-       <server name="PANTHER_APP_DATASOURCE" value="test"/>
+       <server name="PANTHER_APP_ENV" value="test"/>
        <server name="PANTHER_ERROR_SCREENSHOT_DIR" value="./tmp/error-screenshots"/>
    </php>
    <extensions>
@@ -81,7 +81,7 @@ Add `/drivers/` to `.gitignore`.
 
    Delete `defaultTestSuite="App"` to make `vendor/bin/phpunit` run everything, as in a Symfony application.
 
-pieceofcake2/app is being updated to this configuration.
+pieceofcake2/app already has this configuration.
 
 ## Origin
 

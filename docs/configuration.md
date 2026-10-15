@@ -12,7 +12,7 @@ Register the extension, set the datasource of the web server and add an `EndToEn
 <phpunit bootstrap="./tests/bootstrap.php" defaultTestSuite="App">
     <php>
         <!-- The web server uses the test datasource, where the fixtures are -->
-        <server name="PANTHER_APP_DATASOURCE" value="test"/>
+        <server name="PANTHER_APP_ENV" value="test"/>
         <!-- Screenshots of the failed End-to-End tests -->
         <server name="PANTHER_ERROR_SCREENSHOT_DIR" value="./tmp/error-screenshots"/>
     </php>
@@ -55,18 +55,17 @@ PANTHER_WEB_SERVER_PORT=9180 vendor/bin/phpunit --testsuite EndToEnd
 
 ## Environment variables
 
-These are Panther's variables, with Panther's meaning, plus `PANTHER_APP_DATASOURCE`. Set them in the shell,
+These are Panther's variables, with Panther's meaning. Set them in the shell,
 or with `<server>` in `phpunit.xml.dist`.
 
 | Variable | Meaning |
 | --- | --- |
-| `PANTHER_APP_DATASOURCE` | Datasource of the web server, passed as `APP_DATASOURCE` (this package). Usually `test` |
 | `PANTHER_WEB_SERVER_DIR` | Document root. Default: `webroot/` or `app/webroot/` of the project. Relative paths must start with `./` |
 | `PANTHER_WEB_SERVER_PORT` | Port of the web server. Default `9080` |
 | `PANTHER_WEB_SERVER_ROUTER` | Router script, relative to the document root. Default: the [CakePHP router script](#the-cakephp-router-script); empty for none |
 | `PANTHER_READINESS_PATH` | Path requested to check that the web server has started. Default `/` |
 | `PANTHER_EXTERNAL_BASE_URI` | Test an application that is already running at this URL; no web server is started |
-| `PANTHER_APP_ENV` | Passed as `APP_ENV` to the web server |
+| `PANTHER_APP_ENV` | Passed as `APP_ENV` to the web server. Set it to `test` so that `config/database.php` uses the test datasource |
 | `PANTHER_ERROR_SCREENSHOT_DIR` | Directory for the screenshots of failed tests, e.g. `./tmp/error-screenshots` |
 | `PANTHER_ERROR_SCREENSHOT_ATTACH` | Print the screenshots in the JUnit attachment format |
 | `PANTHER_NO_HEADLESS` | Show the browser window |

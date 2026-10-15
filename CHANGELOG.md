@@ -7,8 +7,8 @@
   (`createPantherClient()`, `createAdditionalPantherClient()`, the built-in web server and the `PANTHER_*`
   environment variables) and takes a screenshot of a failed test with `PANTHER_ERROR_SCREENSHOT_DIR`
 - The web server directory defaults to `webroot/`, or `app/webroot/` for the legacy layout
-- `PANTHER_APP_DATASOURCE` passes `APP_DATASOURCE` to the web server, like `PANTHER_APP_ENV` passes `APP_ENV`,
-  so that it uses the datasource of the fixtures
+- `PANTHER_APP_ENV=test`, which Panther passes to the web server as `APP_ENV`, lets `config/database.php` use the `test`
+  datasource, where the fixtures are
 - `resources/router.php`: the CakePHP router script of the web server (the default of
   `PANTHER_WEB_SERVER_ROUTER`); it serves the files of the document root, hands every other URL to
   `index.php` and keeps the cache of the web server in `tmp/cache/panther/`

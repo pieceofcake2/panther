@@ -9,7 +9,7 @@
     <php>
         <ini name="memory_limit" value="-1"/>
         <!-- The web server uses the test datasource, where the fixtures are -->
-        <server name="PANTHER_APP_DATASOURCE" value="test"/>
+        <server name="PANTHER_APP_ENV" value="test"/>
         <!-- Screenshots of the failed End-to-End tests -->
         <server name="PANTHER_ERROR_SCREENSHOT_DIR" value="./tmp/error-screenshots"/>
     </php>

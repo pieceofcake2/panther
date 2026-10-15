@@ -11,8 +11,8 @@ use PieceOfCake2\Panther\TestSuite\PantherTestCase;
  * The web server and the test process share the test database: the browser sees the fixture records, and
  * the test sees what the browser saved.
  *
- * PANTHER_APP_DATASOURCE=test in phpunit.xml.dist gives the web server APP_DATASOURCE=test, and the fixture
- * application uses that datasource as `default` (tests/test_app/config/database.php).
+ * PANTHER_APP_ENV=test in phpunit.xml.dist gives the web server APP_ENV=test, and the fixture application
+ * then uses the `test` datasource as `default` (tests/test_app/config/database.php).
  */
 class FixtureTest extends PantherTestCase
 {

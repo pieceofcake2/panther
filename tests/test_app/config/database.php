@@ -26,8 +26,8 @@ class DATABASE_CONFIG
     ];
 
     /**
-     * Uses the file database, and the datasource in `APP_DATASOURCE` as `default`: PantherTestCase passes it
-     * to the web server from `PANTHER_APP_DATASOURCE` (`test` in phpunit.xml.dist).
+     * Uses the file database, and the `test` datasource as `default` when `APP_ENV` is `test`: Panther passes
+     * `PANTHER_APP_ENV` (`test` in phpunit.xml.dist) to the web server as `APP_ENV`.
      */
     public function __construct()
     {
@@ -36,9 +36,8 @@ class DATABASE_CONFIG
             $this->default['database'] = $file . '.default';
             $this->test['database'] = $file;
         }
-        $datasource = env('APP_DATASOURCE');
-        if ($datasource && $datasource !== 'default' && isset($this->{$datasource})) {
-            $this->default = $this->{$datasource};
+        if (env('APP_ENV') === 'test') {
+            $this->default = $this->test;
         }
     }
 }

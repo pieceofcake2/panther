@@ -11,7 +11,7 @@ port. Stop it, or set `PANTHER_WEB_SERVER_PORT`. For chromedriver (`9515`), pass
 `$managerOptions`.
 
 **`Missing Database Table` in the browser** — The web server does not use the test datasource: check
-`PANTHER_APP_DATASOURCE` in `phpunit.xml.dist` and the `APP_DATASOURCE` lines of `config/database.php`, and
+`PANTHER_APP_ENV` in `phpunit.xml.dist` and the `APP_ENV` lines of `config/database.php`, and
 that the test datasource is not an in-memory SQLite database.
 
 **A variable does not reach the web server** — Set it in the shell, or in `$_ENV` or `$_SERVER`; a variable

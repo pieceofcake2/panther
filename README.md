@@ -77,7 +77,7 @@ It is a library (PSR-4, `PieceOfCake2\Panther\`), not a CakePHP plugin: there is
 
    ```xml
    <php>
-       <server name="PANTHER_APP_DATASOURCE" value="test"/>
+       <server name="PANTHER_APP_ENV" value="test"/>
        <server name="PANTHER_ERROR_SCREENSHOT_DIR" value="./tmp/error-screenshots"/>
    </php>
    <extensions>
@@ -85,13 +85,12 @@ It is a library (PSR-4, `PieceOfCake2\Panther\`), not a CakePHP plugin: there is
    </extensions>
    ```
 
-2. Make `config/database.php` use that datasource as `default` in the web server
-   (pieceofcake2/app's `database.php.default` does):
+2. Make `config/database.php` use the `test` datasource as `default` when `APP_ENV` is `test`, which
+   Panther sets in the web server from `PANTHER_APP_ENV` (pieceofcake2/app's `database.php.default` does):
 
    ```php
-   $datasource = env('APP_DATASOURCE');
-   if ($datasource && $datasource !== 'default' && isset($this->{$datasource})) {
-       $this->default = $this->{$datasource};
+   if (env('APP_ENV') === 'test') {
+       $this->default = $this->test;
    }
    ```
 

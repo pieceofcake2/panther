@@ -33,8 +33,6 @@ use Symfony\Component\Panther\PantherTestCaseTrait;
  *
  * - The web server directory defaults to `webroot/` (or `app/webroot/` for the legacy layout) of the project
  * - The web server router defaults to the CakePHP router script of this package (`resources/router.php`)
- * - `PANTHER_APP_DATASOURCE` passes `APP_DATASOURCE` to the web server, like `PANTHER_APP_ENV` passes `APP_ENV`,
- *   so that `config/database.php` can use the datasource where the fixtures are
  * - The assertions of Panther's `WebTestAssertionsTrait`, without the Symfony FrameworkBundle
  *
  * Every other setting is Panther's: `PANTHER_WEB_SERVER_DIR`, `PANTHER_WEB_SERVER_PORT`,
@@ -80,11 +78,6 @@ abstract class PantherTestCase extends CakeTestCase
             $options['webServerDir'] = static::defaultWebServerDir();
         }
         $options['router'] ??= $_SERVER['PANTHER_WEB_SERVER_ROUTER'] ?? (realpath(static::ROUTER) ?: static::ROUTER);
-
-        $datasource = $_SERVER['PANTHER_APP_DATASOURCE'] ?? null;
-        if (is_string($datasource) && $datasource !== '') {
-            $options['env'] = ['APP_DATASOURCE' => $datasource] + (array)($options['env'] ?? self::$defaultOptions['env']);
-        }
 
         self::startPantherWebServer($options);
     }
