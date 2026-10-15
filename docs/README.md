@@ -1,4 +1,4 @@
-# pieceofcake2/panther
+# Panther Documentation
 
 End-to-End tests for [pieceofcake2/cakephp](https://github.com/pieceofcake2/cakephp) applications with
 [Symfony Panther](https://symfony.com/doc/current/testing/end_to_end.html), Chrome and PHPUnit 9.6, set up the
