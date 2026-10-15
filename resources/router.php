@@ -11,6 +11,11 @@
  *
  * and, because the web server uses the test datasource as `default`, it keeps its cache (`CACHE`) in
  * `tmp/cache/panther/`, so that the model cache of your development server is not used for the test database.
+ *
+ * The built-in web server does not put the environment variables into `$_SERVER` (Apache and PHP-FPM do), so
+ * a `.env` loader that skips existing `$_SERVER` keys would replace the values Panther passes to the web
+ * server (`env` option, `PANTHER_APP_ENV`) with the ones of `.env`. The router copies them into `$_SERVER`
+ * and `$_ENV` first, as a web server does.
  */
 
 $pantherDocumentRoot = rtrim((string)$_SERVER['DOCUMENT_ROOT'], '/\\');
@@ -22,6 +27,11 @@ if (
     && strtolower(pathinfo($pantherFile, PATHINFO_EXTENSION)) !== 'php'
 ) {
     return false;
+}
+
+foreach (getenv() as $pantherName => $pantherValue) {
+    $_SERVER[$pantherName] ??= $pantherValue;
+    $_ENV[$pantherName] ??= $pantherValue;
 }
 
 $pantherTmp = dirname($pantherDocumentRoot) . DIRECTORY_SEPARATOR . 'tmp';
@@ -38,6 +48,6 @@ if (!defined('CACHE') && is_dir($pantherTmp)) {
 $_SERVER['SCRIPT_FILENAME'] = $pantherDocumentRoot . DIRECTORY_SEPARATOR . 'index.php';
 $_SERVER['SCRIPT_NAME'] = $_SERVER['PHP_SELF'] = '/index.php';
 
-unset($pantherDocumentRoot, $pantherFile, $pantherTmp, $pantherCache, $pantherDir);
+unset($pantherDocumentRoot, $pantherFile, $pantherName, $pantherValue, $pantherTmp, $pantherCache, $pantherDir);
 
 return require $_SERVER['SCRIPT_FILENAME'];

@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- `resources/router.php` copies the environment variables of the web server into `$_SERVER` and `$_ENV`, as Apache
+  and PHP-FPM do. The PHP built-in web server leaves them out of `$_SERVER`, so a `.env` loader that skips existing
+  `$_SERVER` keys replaced the values passed with the `env` option or `PANTHER_APP_ENV` with those of `.env`
+
 - The screenshots of failed tests get file names that can be uploaded as GitHub Actions artifacts: `"`, `<`, `>`,
   `|`, `*`, `?`, `/` and line breaks in the test name (for example the quotes around the data set of a test with a
   data provider) are replaced with `_` (`PantherTestCase::screenshotName()`)
