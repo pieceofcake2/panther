@@ -132,8 +132,13 @@ class ReportTest extends PantherTestCase
         $this->assertSame(5000, $height);
         $this->assertContains(3000, $result->screenshots[2]->breaks);
         // What fits on a page of the report under the title: 1900 pixels from the top of the page, or of the element
-        $this->assertSame([$width, 1900], self::imageSize($recorder, $result->screenshots[3]));
-        $this->assertSame([$width, 1900], self::imageSize($recorder, $result->screenshots[4]));
+        // (as wide as the viewport, with or without the scroll bar)
+        foreach ([$result->screenshots[3], $result->screenshots[4]] as $screenshot) {
+            [$fitWidth, $fitHeight] = self::imageSize($recorder, $screenshot);
+            $this->assertSame(1900, $fitHeight);
+            $this->assertGreaterThan($screenshot->viewportWidth - 30, $fitWidth);
+            $this->assertLessThanOrEqual($screenshot->viewportWidth, $fitWidth);
+        }
         $this->assertLessThanOrEqual($result->screenshots[2]->viewportWidth, $width);
         $this->assertGreaterThan($result->screenshots[2]->viewportWidth - 30, $width);
     }
