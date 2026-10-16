@@ -8,8 +8,10 @@
          colors="true">
     <php>
         <ini name="memory_limit" value="-1"/>
-        <!-- The web server uses the test datasource, where the fixtures are -->
-        <server name="PANTHER_APP_ENV" value="test"/>
+        <!--
+            tests/bootstrap.php sets APP_ENV=test by default: the tests and the web server load .env.test, where
+            DATABASE_URL is the test database
+        -->
     </php>
     <extensions>
         <extension class="PieceOfCake2\Panther\ServerExtension"/>
