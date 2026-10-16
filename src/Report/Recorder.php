@@ -335,9 +335,10 @@ final class Recorder
      * @param string|null $type `Screenshot::END`, `Screenshot::FAILURE` or null
      * @param string|null $element CSS selector or XPath of an element to scroll to
      * @param bool $fullPage Takes the whole page
+     * @param bool $fitToPage Takes what fits on a page of the report
      * @return void
      */
-    public function takeScreenshots(string $name, array $clients, ?string $stepName, ?string $type, ?string $element = null, bool $fullPage = false): void
+    public function takeScreenshots(string $name, array $clients, ?string $stepName, ?string $type, ?string $element = null, bool $fullPage = false, bool $fitToPage = false): void
     {
         $result = $this->result($name);
         if ($result === null) {
@@ -349,7 +350,7 @@ final class Recorder
                 continue;
             }
             $this->detectBrowser($client);
-            $screenshots = $this->screenshotter->take($client, $this->dir, $prefix, $result->nextStep(), $stepName, $type, $element, $fullPage);
+            $screenshots = $this->screenshotter->take($client, $this->dir, $prefix, $result->nextStep(), $stepName, $type, $element, $fullPage, $fitToPage);
             array_push($result->screenshots, ...$screenshots);
         }
     }

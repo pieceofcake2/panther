@@ -68,15 +68,21 @@ final class Screenshotter
      * @param string|null $type `Screenshot::END`, `Screenshot::FAILURE` or null
      * @param string|null $element CSS selector or XPath of an element to scroll to before taking the viewport
      * @param bool $fullPage Takes the whole page instead of the viewport
+     * @param bool $fitToPage Takes what fits on a page of the report (`PART_HEIGHT`), from the top of the page or of
+     *   the element, instead of the viewport
      * @return array<\PieceOfCake2\Panther\Report\Screenshot>
      */
-    public function take(Client $client, string $dir, string $prefix, int $step, ?string $name, ?string $type, ?string $element = null, bool $fullPage = false): array
+    public function take(Client $client, string $dir, string $prefix, int $step, ?string $name, ?string $type, ?string $element = null, bool $fullPage = false, bool $fitToPage = false): array
     {
         $mode = 'Viewport';
+        $top = 0.0;
         if ($element !== null) {
-            $this->scrollTo($client, $element);
+            $top = $this->scrollTo($client, $element);
             $mode = 'Element: ' . $element;
             $fullPage = false;
+        }
+        if ($fitToPage && !$fullPage) {
+            $mode = 'Fit to page' . ($element !== null ? ': ' . $element : '');
         }
 
         /** @var array{string, string, int, int} $page */
@@ -90,6 +96,8 @@ final class Screenshotter
         } elseif ($fullPage) {
             $mode = 'Full page';
             $images = $this->fullPage($devTools);
+        } elseif ($fitToPage) {
+            $images[] = ['jpg', $this->fitToPage($devTools, $top)];
         } else {
             $images[] = ['jpg', $this->capture($devTools, null)];
         }
@@ -124,13 +132,17 @@ final class Screenshotter
      *
      * @param \Symfony\Component\Panther\Client $client Client
      * @param string $element CSS selector or XPath
-     * @return void
+     * @return float The top of the element in the page (CSS pixels)
      */
-    private function scrollTo(Client $client, string $element): void
+    private function scrollTo(Client $client, string $element): float
     {
         $by = preg_match('#\A(\.?/|\()#', $element) ? WebDriverBy::xpath($element) : WebDriverBy::cssSelector($element);
         $found = $client->getWebDriver()->findElement($by);
-        $client->executeScript('arguments[0].scrollIntoView({block: "start", inline: "nearest"});', [$found]);
+
+        return (float)$client->executeScript(
+            'arguments[0].scrollIntoView({block: "start", inline: "nearest"}); return arguments[0].getBoundingClientRect().top + window.scrollY;',
+            [$found],
+        );
     }
 
     /**
@@ -176,6 +188,26 @@ final class Screenshotter
         }
 
         return $images;
+    }
+
+    /**
+     * What fits on a page of the report: `PART_HEIGHT` CSS pixels of the page from a position, or less at its end
+     *
+     * @param \Facebook\WebDriver\Chrome\ChromeDevToolsDriver $devTools DevTools
+     * @param float $top Top of the area in the page (CSS pixels)
+     * @return string
+     */
+    private function fitToPage(ChromeDevToolsDriver $devTools, float $top): string
+    {
+        $metrics = $devTools->execute('Page.getLayoutMetrics');
+        $width = (int)ceil((float)($metrics['cssLayoutViewport']['clientWidth'] ?? 0));
+        $height = (int)ceil((float)($metrics['cssContentSize']['height'] ?? 0));
+        $top = max(0, min((int)floor($top), $height - 1));
+        if ($width <= 0 || $height <= 0) {
+            return $this->capture($devTools, null);
+        }
+
+        return $this->capture($devTools, ['x' => 0, 'y' => $top, 'width' => $width, 'height' => min(self::PART_HEIGHT, $height - $top)]);
     }
 
     /**

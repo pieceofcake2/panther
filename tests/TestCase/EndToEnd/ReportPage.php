@@ -42,6 +42,8 @@ class ReportPage extends PantherTestCase
         $client->executeScript(self::TALL_PAGE);
         $this->takeReportScreenshot('Red block', '#target');
         $this->takeReportScreenshot('Whole page', null, true);
+        $this->takeReportScreenshot('A page of the report', null, false, true);
+        $this->takeReportScreenshot('A page from the red block', '#target', false, true);
 
         $this->assertSelectorExists('#target');
     }

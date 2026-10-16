@@ -94,6 +94,7 @@ public function testApply(): void
 | --- | --- | --- |
 | `takeReportScreenshot('Name')` | `Viewport` | What the browser shows, where it is scrolled to |
 | `takeReportScreenshot('Name', element: '.jobs')` | `Element: .jobs` | The viewport after the element is scrolled to the top, for a part of the page below the fold |
+| `takeReportScreenshot('Name', fitToPage: true)` | `Fit to page` | What fits on a page of the report (1500 CSS pixels) from the top of the page, or from the top of `element` |
 | `takeReportScreenshot('Name', fullPage: true)` | `Full page` | The whole page, split into parts of the same height of at most 1500 CSS pixels, so that each fits on a page of the report (20 parts at most) |
 
 `element` is a CSS selector, or an XPath when it starts with `/`, `./` or `(`. Without `PANTHER_REPORT_PDF`,

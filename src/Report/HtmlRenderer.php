@@ -260,8 +260,8 @@ final class HtmlRenderer
                 }
                 $class = $screenshot->height > $screenshot->width ? 'portrait' : '';
                 $style = '';
-                if ($screenshot->mode === 'Full page') {
-                    // A full page keeps the scale of the report, so that its parts fill the pages
+                if ($screenshot->mode === 'Full page' || str_starts_with($screenshot->mode, 'Fit to page')) {
+                    // A full page (or a page of it) keeps the scale of the report, so that it fills a page
                     $class = 'full';
                     $style = sprintf('width: %.1fmm', $screenshot->viewportWidth * self::MM_PER_PIXEL);
                 }

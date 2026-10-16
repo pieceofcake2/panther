@@ -8,8 +8,9 @@
   languages with `PANTHER_REPORT_LOCALE_DIR`), with the titles of `@testdox` or the doc comments of the tests,
   and the repository, branch, commit and run of GitHub Actions or of the local Git
 - `PantherTestCase::takeReportScreenshot()` takes a screenshot of a step for the report: the viewport, the
-  viewport scrolled to an element, or the whole page. A test that takes none gets the screenshot of its end, and
-  a failed test the screenshot of its failure, taken before `tearDown()`
+  viewport scrolled to an element, what fits on a page of the report, or the whole page in parts of the same
+  height. A test that takes none gets the screenshot of its end, and a failed test the screenshot of its failure,
+  taken before `tearDown()`
 - CI example (docs): the job uploads the report as a PDF, not a zip (`archive: false` of actions/upload-artifact)
 
 ## 1.0.1

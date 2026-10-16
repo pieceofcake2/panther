@@ -125,13 +125,18 @@ class ReportTest extends PantherTestCase
             [3, 'Whole page', 'Full page', 2, 4],
             [3, 'Whole page', 'Full page', 3, 4],
             [3, 'Whole page', 'Full page', 4, 4],
+            [4, 'A page of the report', 'Fit to page', 1, 1],
+            [5, 'A page from the red block', 'Fit to page: #target', 1, 1],
         ], $steps);
 
         // The parts of a full page of 5000 pixels: 4 parts of 1250 pixels, as wide as the page
         // (the viewport without its scroll bar, which takes 15 pixels on Linux)
-        $sizes = array_map(static fn(Screenshot $screenshot): array => self::imageSize($recorder, $screenshot), array_slice($result->screenshots, 2));
+        $sizes = array_map(static fn(Screenshot $screenshot): array => self::imageSize($recorder, $screenshot), array_slice($result->screenshots, 2, 4));
         $width = $sizes[0][0];
         $this->assertSame([[$width, 1250], [$width, 1250], [$width, 1250], [$width, 1250]], $sizes);
+        // What fits on a page of the report: 1500 pixels from the top of the page, or of the element
+        $this->assertSame([$width, 1500], self::imageSize($recorder, $result->screenshots[6]));
+        $this->assertSame([$width, 1500], self::imageSize($recorder, $result->screenshots[7]));
         $this->assertLessThanOrEqual($result->screenshots[2]->viewportWidth, $width);
         $this->assertGreaterThan($result->screenshots[2]->viewportWidth - 30, $width);
     }
@@ -143,14 +148,17 @@ class ReportTest extends PantherTestCase
         }
         $recorder = $this->record(['testSteps']);
 
-        $screenshot = self::result($recorder, 'testSteps')->screenshots[1];
-        $image = imagecreatefromjpeg($recorder->dir() . DS . $screenshot->file);
-        $this->assertNotFalse($image);
-        $rgb = imagecolorat($image, 10, 10);
+        $screenshots = self::result($recorder, 'testSteps')->screenshots;
+        // The viewport scrolled to the element, and a page of the report from the element
+        foreach ([$screenshots[1], $screenshots[7]] as $screenshot) {
+            $image = imagecreatefromjpeg($recorder->dir() . DS . $screenshot->file);
+            $this->assertNotFalse($image);
+            $rgb = imagecolorat($image, 10, 10);
 
-        // The red block, not the blue one above it
-        $this->assertGreaterThan(200, ($rgb >> 16) & 0xff);
-        $this->assertLessThan(60, $rgb & 0xff);
+            // The red block, not the blue one above it
+            $this->assertGreaterThan(200, ($rgb >> 16) & 0xff, $screenshot->mode);
+            $this->assertLessThan(60, $rgb & 0xff, $screenshot->mode);
+        }
     }
 
     public function testAFailedTestGetsTheScreenshotOfTheFailure(): void
