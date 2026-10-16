@@ -29,7 +29,7 @@ built from `$_ENV` first, then from `getenv()`. A `.env` loader that writes to `
 environment variables (for example josegonzalez/dotenv's `toEnv()`), when PHP does not fill `$_ENV` itself
 (`variables_order` without `E`, the default and on the GitHub runners), gives the web server the `.env` values
 even where the shell sets other ones, such as the URL of the test database in CI. Do not write `.env` values to
-`$_ENV` that way: symfony/dotenv's `bootEnv()`, which pieceofcake2/app uses, copies the real variables into
+`$_ENV` that way: symfony/dotenv's `loadEnv()`, which pieceofcake2/app uses, copies the real variables into
 `$_ENV` first and keeps them. Otherwise pass such values with the `env` option:
 `static::createPantherClient(['env' => ['DATABASE_URL' => (string)env('DATABASE_URL')]])`.
 

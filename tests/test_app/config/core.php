@@ -11,9 +11,9 @@ use Symfony\Component\Dotenv\Dotenv;
  * (tests/bootstrap.php), and the web server inherits it, so both processes load the committed
  * config/.env.test. Real environment variables win over the files.
  */
-(new Dotenv())->usePutenv()->bootEnv(CONFIG . '.env');
+(new Dotenv())->usePutenv()->loadEnv(CONFIG . '.env');
 
-Configure::write('debug', (int)env('DEBUG'));
+Configure::write('debug', env('APP_DEBUG') ?? 0);
 Configure::write('Error', [
     'handler' => 'ErrorHandler::handleError',
     'level' => E_ALL & ~E_DEPRECATED,

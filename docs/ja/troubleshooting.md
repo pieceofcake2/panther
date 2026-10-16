@@ -29,7 +29,7 @@ SQLite データベースでないことを確認してください。
 josegonzalez/dotenv の `toEnv()`) では、PHP 自身が `$_ENV` を埋めない場合 (`variables_order` に `E` が無い場合。
 デフォルトと GitHub のランナーがこれに当たります)、CI のテスト用 DB の URL のようにシェルで別の値を設定していても、
 Web サーバーには `.env` の値が渡ります。そのような方法で `.env` の値を `$_ENV` に書き込まないでください。
-pieceofcake2/app が使う symfony/dotenv の `bootEnv()` は、先に実際の環境変数を `$_ENV` にコピーして残します。
+pieceofcake2/app が使う symfony/dotenv の `loadEnv()` は、先に実際の環境変数を `$_ENV` にコピーして残します。
 そうできない場合は、このような値を `env` オプションで渡してください: `static::createPantherClient(['env' => ['DATABASE_URL' => (string)env('DATABASE_URL')]])`。
 
 **スクリーンショットの日本語が四角 (豆腐) で表示される** — GitHub のランナーのように、日本語 (CJK) のフォントが
