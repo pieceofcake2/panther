@@ -58,8 +58,26 @@ is in the test database too, so the test can check it with a model.
 The web server inherits the environment variables of the test process: the ones of your shell, and the ones
 in `$_ENV` or `$_SERVER` (Symfony Process does not pass a variable that is only set with `putenv()`). Real
 environment variables reach the web server this way and win over `config/.env.test` there as well, for
-example `DATABASE_URL` set to `mysql://root:root@127.0.0.1:3306/test_app` or, for an
-SQLite file that both processes open, to an absolute path such as
-`sqlite:////var/tmp/myapp/end_to_end.sqlite` (four slashes). Do not use a relative path
-(`sqlite:///tmp/...`): the tests resolve it from the project root, but the web server from the document root
-(`webroot/`), so the browser and the tests would use two different files.
+example `DATABASE_URL` set to `mysql://root:root@127.0.0.1:3306/test_app`.
+
+<a id="relative-paths"></a>
+
+## Relative Paths
+
+The web server runs the application in the working directory of the tests: `PantherTestCase` passes it to
+the web server as `PANTHER_WORKING_DIR`, and the [CakePHP router script](configuration.md#the-cakephp-router-script)
+changes to it before it runs `index.php`. A relative path is resolved from the project root, where you run
+PHPUnit, in both processes, so an SQLite file with a relative path in the committed `config/.env.test` is
+the same file for the tests and for the browser:
+
+```dotenv
+# config/.env.test
+DATABASE_URL="sqlite:///tmp/tests/test.sqlite"
+```
+
+`sqlite:///tmp/tests/test.sqlite` (three slashes) is `tmp/tests/test.sqlite` of the project, an absolute path
+has four slashes (`sqlite:////var/tmp/test.sqlite`). The directory must exist; SQLite creates the file.
+
+In production, Apache and PHP-FPM run PHP in the directory of `index.php` (`webroot/`), so a relative path of
+the application points elsewhere there than in the tests. CakePHP 2 itself opens its files with absolute paths
+(`TMP`, `LOGS`); build the paths of your application from these constants too.

@@ -117,9 +117,23 @@ Panther のものです。
   ドキュメントルートの `index.php` に渡します。`/articles.json` のようにファイルに見える URL も同様です
 - Web サーバーのキャッシュ (`CACHE`) を `tmp/cache/panther/` に置きます。Web サーバーは
   テスト用データベースを `default` として使うので、開発用サーバーのモデルキャッシュを使ってはいけないためです
+- `PantherTestCase` が `PANTHER_WORKING_DIR` として Web サーバーに渡す、テストの作業ディレクトリに移動します。
+  ビルトイン Web サーバーはドキュメントルートで PHP を実行するので、そのままでは相対パスがテストとは別の
+  ファイルを指すためです ([相対パス](test-database.md#relative-paths))
 
 さらにカスタマイズするには、このスクリプトをアプリケーションにコピーし、`PANTHER_WEB_SERVER_ROUTER` に
 そのコピーのパスをドキュメントルートからの相対パスで設定します。例: `../tests/router.php`
+`PANTHER_WORKING_DIR` は自分のルータースクリプトにも渡されるので、同じようにそこへ移動できます。
+
+```php
+$workingDir = getenv('PANTHER_WORKING_DIR');
+if (is_string($workingDir) && is_dir($workingDir)) {
+    chdir($workingDir);
+}
+```
+
+Web サーバーを別のディレクトリで実行するには、そのディレクトリを `env` オプションで渡してください。
+テストの作業ディレクトリより優先されます: `static::createPantherClient(['env' => ['PANTHER_WORKING_DIR' => $dir]])`
 
 <a id="modern-and-legacy-layouts"></a>
 

@@ -64,8 +64,27 @@ Web サーバーの `default` 接続は同じデータベースなので、Web �
 Web サーバーは、テストのプロセスの環境変数を引き継ぎます。シェルの環境変数と、`$_ENV` または
 `$_SERVER` にある変数です (Symfony Process は `putenv()` だけで設定された変数を渡しません)。実際の環境変数は
 この方法で Web サーバーに渡され、Web サーバーでも `config/.env.test` より優先されます。たとえば
-`DATABASE_URL` を `mysql://root:root@127.0.0.1:3306/test_app` に設定するか、両方の
-プロセスが開く SQLite ファイルなら `sqlite:////var/tmp/myapp/end_to_end.sqlite` (スラッシュ 4 つ) のような
-絶対パスに設定します。相対パス (`sqlite:///tmp/...`) は使わないでください。テストはプロジェクトルートから、
-Web サーバーはドキュメントルート (`webroot/`) から解決するので、ブラウザーとテストで別のファイルを使うことに
-なります。
+`DATABASE_URL` を `mysql://root:root@127.0.0.1:3306/test_app` に設定します。
+
+<a id="relative-paths"></a>
+
+## 相対パス
+
+Web サーバーは、テストの作業ディレクトリでアプリケーションを実行します。`PantherTestCase` がそのディレクトリを
+`PANTHER_WORKING_DIR` として Web サーバーに渡し、[CakePHP のルータースクリプト](configuration.md#the-cakephp-router-script)
+が `index.php` を実行する前にそこへ移動します。相対パスはどちらのプロセスでも PHPUnit を実行するプロジェクト
+ルートから解決されるので、コミットされた `config/.env.test` で SQLite ファイルを相対パスで指定しても、
+テストとブラウザーは同じファイルを使います。
+
+```dotenv
+# config/.env.test
+DATABASE_URL="sqlite:///tmp/tests/test.sqlite"
+```
+
+`sqlite:///tmp/tests/test.sqlite` (スラッシュ 3 つ) はプロジェクトの `tmp/tests/test.sqlite` です。絶対パスは
+スラッシュ 4 つです (`sqlite:////var/tmp/test.sqlite`)。ディレクトリは存在していなければなりません。ファイルは
+SQLite が作成します。
+
+本番環境では、Apache や PHP-FPM は `index.php` のディレクトリ (`webroot/`) で PHP を実行するので、
+アプリケーションの相対パスはテストとは別の場所を指します。CakePHP 2 自体は、ファイルを絶対パス (`TMP`、`LOGS`)
+で開きます。アプリケーションのパスも、これらの定数から組み立ててください。

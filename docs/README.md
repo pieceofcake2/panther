@@ -24,6 +24,7 @@ its `PantherTestCase` starts the application with PHP's built-in web server and 
 | The assertions of `WebTestAssertionsTrait` | `PieceOfCake2\Panther\TestSuite\WebTestAssertionsTrait`, the same assertions without the Symfony FrameworkBundle |
 | `PANTHER_WEB_SERVER_DIR` defaults to `public/` | defaults to `webroot/` (or `app/webroot/`) |
 | `PANTHER_WEB_SERVER_ROUTER` defaults to none | defaults to the [CakePHP router script](configuration.md#the-cakephp-router-script) |
+| The web server runs PHP in the document root | runs it in the working directory of the tests, so [relative paths](test-database.md#relative-paths) are the same |
 | `APP_ENV=test` of `phpunit.xml.dist` makes the tests and the web server load `.env.test` | the same, with `config/.env.test` of pieceofcake2/app; its tests run with `APP_ENV=test` by default |
 
 Everything else is Panther's own: the `Client` (`request()`, `clickLink()`, `submitForm()`, `waitFor()`,

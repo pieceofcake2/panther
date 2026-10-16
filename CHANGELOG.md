@@ -1,5 +1,16 @@
 # CHANGELOG
 
+## Unreleased
+
+- The web server runs the application in the working directory of the tests: `PantherTestCase::startWebServer()`
+  passes it to the web server as `PANTHER_WORKING_DIR` (`PantherTestCase::WORKING_DIR`; a value of the `env`
+  option wins), and `resources/router.php` changes to it before it runs `index.php`. The built-in web server ran
+  PHP in the document root, the tests in the project root, so a relative path such as the SQLite file
+  `sqlite:///tmp/tests/test.sqlite` in `config/.env.test` pointed to two different files. A router script of your
+  own gets the variable too
+- Docs: relative paths in the test database (docs/test-database.md#relative-paths), instead of an absolute SQLite
+  path
+
 ## 1.0.2
 
 - Test report: with `PANTHER_REPORT_PDF`, `ServerExtension` writes a PDF report of the End-to-End tests after the

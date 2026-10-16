@@ -16,6 +16,15 @@
  * a `.env` loader that skips existing `$_SERVER` keys would replace the values Panther passes to the web
  * server (`env` option, `PANTHER_APP_ENV`) with the ones of `.env`. The router copies them into `$_SERVER`
  * and `$_ENV` first, as a web server does.
+ *
+ * The built-in web server runs PHP with the document root as working directory, the tests run in the project
+ * root (where PHPUnit is started). `PantherTestCase` passes the working directory of the tests in
+ * `PANTHER_WORKING_DIR`, and the router changes to it before it runs `index.php`, so that a relative path, such
+ * as the SQLite file `sqlite:///tmp/tests/test.sqlite` of `DATABASE_URL`, points to the same file in the tests
+ * and in the web server. CakePHP 2 itself opens its files with absolute paths. Apache and PHP-FPM run PHP with
+ * the directory of the script as working directory, so an application that relies on relative paths behaves
+ * like in the tests here, not like in production. A router script of your own (`PANTHER_WEB_SERVER_ROUTER`)
+ * gets `PANTHER_WORKING_DIR` too, and can change to it the same way.
  */
 
 $pantherDocumentRoot = rtrim((string)$_SERVER['DOCUMENT_ROOT'], '/\\');
@@ -34,6 +43,11 @@ foreach (getenv() as $pantherName => $pantherValue) {
     $_ENV[$pantherName] ??= $pantherValue;
 }
 
+$pantherWorkingDir = getenv('PANTHER_WORKING_DIR');
+if (is_string($pantherWorkingDir) && $pantherWorkingDir !== '' && is_dir($pantherWorkingDir)) {
+    chdir($pantherWorkingDir);
+}
+
 $pantherTmp = dirname($pantherDocumentRoot) . DIRECTORY_SEPARATOR . 'tmp';
 if (!defined('CACHE') && is_dir($pantherTmp)) {
     $pantherCache = $pantherTmp . DIRECTORY_SEPARATOR . 'cache' . DIRECTORY_SEPARATOR . 'panther' . DIRECTORY_SEPARATOR;
@@ -48,6 +62,6 @@ if (!defined('CACHE') && is_dir($pantherTmp)) {
 $_SERVER['SCRIPT_FILENAME'] = $pantherDocumentRoot . DIRECTORY_SEPARATOR . 'index.php';
 $_SERVER['SCRIPT_NAME'] = $_SERVER['PHP_SELF'] = '/index.php';
 
-unset($pantherDocumentRoot, $pantherFile, $pantherName, $pantherValue, $pantherTmp, $pantherCache, $pantherDir);
+unset($pantherDocumentRoot, $pantherFile, $pantherName, $pantherValue, $pantherWorkingDir, $pantherTmp, $pantherCache, $pantherDir);
 
 return require $_SERVER['SCRIPT_FILENAME'];

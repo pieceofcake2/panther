@@ -197,11 +197,12 @@ PANTHER_NO_HEADLESS=1 vendor/bin/phpunit --testsuite EndToEnd --debug
 | `static createPantherClient(array $options = [], array $kernelOptions = [], array $managerOptions = [])` | The browser; starts the web server and the browser at the first call (Panther) |
 | `static createAdditionalPantherClient()` | Another, isolated browser (Panther) |
 | `static createHttpBrowserClient(array $options = [])` | A client without JavaScript, through HTTP (Panther) |
-| `static startWebServer(array $options = [])` | Starts the web server with the CakePHP defaults, then as Panther does |
+| `static startWebServer(array $options = [])` | Starts the web server with the CakePHP defaults (and `PANTHER_WORKING_DIR`), then as Panther does |
 | `static stopWebServer()`, `static isWebServerStarted()` | Panther |
 | `static defaultWebServerDir(?string $projectRoot = null)` | `webroot/` or `app/webroot/` of the project (protected) |
 | `tearDown()` | `CakeTestCase::tearDown()`, then the screenshot of a failed test |
 | `ROUTER` | Path of the CakePHP router script |
+| `WORKING_DIR` | `PANTHER_WORKING_DIR`, the variable that gives the web server the working directory of the tests |
 | `CHROME`, `FIREFOX`, `SELENIUM` | Values of the `browser` option |
 
 ### WebTestAssertionsTrait

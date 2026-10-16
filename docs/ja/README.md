@@ -27,6 +27,7 @@ CakePHP 2 アプリケーションで行います。
 | `WebTestAssertionsTrait` のアサーション | `PieceOfCake2\Panther\TestSuite\WebTestAssertionsTrait`。Symfony の FrameworkBundle なしで使える同じアサーション |
 | `PANTHER_WEB_SERVER_DIR` のデフォルトは `public/` | デフォルトは `webroot/` (または `app/webroot/`) |
 | `PANTHER_WEB_SERVER_ROUTER` のデフォルトはなし | デフォルトは [CakePHP のルータースクリプト](configuration.md#the-cakephp-router-script) |
+| Web サーバーはドキュメントルートで PHP を実行する | テストの作業ディレクトリで実行するので、[相対パス](test-database.md#relative-paths) がテストと同じになる |
 | `phpunit.xml.dist` の `APP_ENV=test` で、テストと Web サーバーが `.env.test` を読み込む | 同じ。pieceofcake2/app の `config/.env.test` を読み込む。テストはデフォルトで `APP_ENV=test` で動く |
 
 それ以外はすべて Panther そのものです。`Client` (`request()`、`clickLink()`、`submitForm()`、`waitFor()`、
