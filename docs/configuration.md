@@ -67,7 +67,7 @@ or with `<server>` in `phpunit.xml.dist`.
 | `PANTHER_ERROR_SCREENSHOT_DIR` | Directory for the screenshots of failed tests, e.g. `./tmp/error-screenshots` |
 | `PANTHER_ERROR_SCREENSHOT_ATTACH` | Print the screenshots in the JUnit attachment format |
 | `PANTHER_NO_HEADLESS` | Show the browser window |
-| `PANTHER_DEVTOOLS` | Open the DevTools of the browser |
+| `PANTHER_DEVTOOLS` | Open the DevTools of the browser. Closed by default, as in Panther 2.3+, also with an older Panther (installed on PHP 8.0), which opens them docked in the window: the page is narrower, and the screenshots of the report used the scale of a phone |
 | `PANTHER_NO_REDUCED_MOTION` | Do not ask for reduced motion (Panther 2.2+) |
 | `PANTHER_NO_SANDBOX` | Disable the sandbox of Chrome (containers, CI) |
 | `PANTHER_CHROME_ARGUMENTS` | More Chrome arguments, separated by spaces, e.g. `--lang=ja --window-size=1600,1200` |

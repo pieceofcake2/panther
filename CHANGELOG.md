@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- `PantherTestCase` closes the DevTools of Chrome unless `PANTHER_DEVTOOLS` is set, as Panther 2.3+ does. Panther
+  before 2.3 (installed on PHP 8.0) opened them docked in the window, which made the page 645 pixels wide instead of
+  1200, so the screenshots of the report used the scale of a phone and what fits on a page was cut at 1357 pixels.
+  `PANTHER_DEVTOOLS=1` still opens them
 - The web server runs the application in the working directory of the tests: `PantherTestCase::startWebServer()`
   passes it to the web server as `PANTHER_WORKING_DIR` (`PantherTestCase::WORKING_DIR`; a value of the `env`
   option wins), and `resources/router.php` changes to it before it runs `index.php`. The built-in web server ran
