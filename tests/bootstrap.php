@@ -3,9 +3,19 @@
  * Bootstrap for PHPUnit
  *
  * The tests run against the fixture application in tests/test_app (PANTHER_WEB_SERVER_DIR in phpunit.xml.dist).
+ *
+ * As in pieceofcake2/app, the tests run with APP_ENV=test by default (an APP_ENV from the environment wins), so
+ * tests/test_app/config/core.php loads config/.env.test, where DATABASE_URL is the test database. The web
+ * server inherits it from $_ENV and $_SERVER (see Symfony Process) and loads the same file.
  */
 
 use Composer\InstalledVersions;
+
+if ((string)getenv('APP_ENV') === '' && empty($_SERVER['APP_ENV'])) {
+    putenv('APP_ENV=test');
+    $_ENV['APP_ENV'] = 'test';
+    $_SERVER['APP_ENV'] = 'test';
+}
 
 if (!defined('DS')) {
     define('DS', DIRECTORY_SEPARATOR);
@@ -24,13 +34,14 @@ foreach (['cache/models', 'cache/persistent', 'logs'] as $dir) {
     }
 }
 
+// The tmp directory of the repository, where DATABASE_URL of tests/test_app/config/.env.test keeps the SQLite file
+if (!is_dir(dirname(__DIR__) . DS . 'tmp')) {
+    mkdir(dirname(__DIR__) . DS . 'tmp', 0777, true);
+}
+
 // The tmp directory of the fixture application, where the router script keeps the cache of the web server
 if (!is_dir(__DIR__ . DS . 'test_app' . DS . 'tmp')) {
     mkdir(__DIR__ . DS . 'test_app' . DS . 'tmp', 0777, true);
 }
-
-// The SQLite file database of the fixture application, shared by the test process and the web server, which
-// inherits the variables of $_ENV (see Symfony Process); see tests/test_app/config/database.php
-$_ENV['TEST_APP_DATABASE'] = TMP . 'test_app.sqlite';
 
 require_once InstalledVersions::getInstallPath('pieceofcake2/cakephp') . DS . 'tests' . DS . 'bootstrap.php';
