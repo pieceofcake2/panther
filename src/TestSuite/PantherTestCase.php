@@ -233,7 +233,7 @@ abstract class PantherTestCase extends CakeTestCase
      * Starts the PHP built-in web server with the CakePHP defaults, then as Panther does.
      *
      * The web server gets the working directory of the test process in `PANTHER_WORKING_DIR` (unless the `env`
-     * option sets it), and the CakePHP router script changes to it: the built-in web server runs PHP in the
+     * option, or `$defaultOptions['env']` without it, sets it), and the CakePHP router script changes to it: the built-in web server runs PHP in the
      * document root, the tests in the project root, so a relative path, such as an SQLite file of
      * `DATABASE_URL`, would point to two different files.
      *
@@ -248,7 +248,7 @@ abstract class PantherTestCase extends CakeTestCase
         $options['router'] ??= $_SERVER['PANTHER_WEB_SERVER_ROUTER'] ?? (realpath(static::ROUTER) ?: static::ROUTER);
         $workingDir = getcwd();
         if ($workingDir !== false) {
-            $options['env'] = (array)($options['env'] ?? []) + [self::WORKING_DIR => $workingDir];
+            $options['env'] = (array)($options['env'] ?? static::$defaultOptions['env'] ?? []) + [self::WORKING_DIR => $workingDir];
         }
 
         self::startPantherWebServer($options);
