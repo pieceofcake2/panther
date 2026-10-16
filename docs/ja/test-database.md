@@ -19,7 +19,7 @@ if ((string)getenv('APP_ENV') === '' && empty($_SERVER['APP_ENV'])) {
 ```
 
 テストは `APP_ENV=test` で実行され、Panther が起動する Web サーバーはテストのプロセスの環境を引き継ぐので、
-Web サーバーも `APP_ENV=test` で動きます。pieceofcake2/app は、両方のプロセスで `config/.env.test` (Symfony の
+Web サーバーも `APP_ENV=test` で動きます。pieceofcake2/app は、両方のプロセスで `config/.env` の後に `config/.env.test` (Symfony の
 `.env.{APP_ENV}` ファイル) を読み込みます。このファイルはコミットされていて、`DATABASE_URL` をテスト用
 データベースに設定します。Symfony と同じように変数は 1 つで、`DATABASE_URL` は現在の環境のデータベースです。
 
@@ -39,8 +39,9 @@ public function __construct()
 }
 ```
 
-自分のテスト用データベースは、`config/.env.test.local` (Git では無視されます) か、`config/.env.test` より
-優先される実際の環境変数で設定してください (CI はこの方法で `DATABASE_URL` を設定します)。環境変数は
+自分のテスト用データベースは、`config/.env.test` の後に読み込まれる `config/.env.test.local` (Git では
+無視されます。`DATABASE_URL` など、変える変数だけを書きます) か、ファイルより優先される実際の環境変数で
+設定してください (CI はこの方法で `DATABASE_URL` を設定します)。環境変数は
 ファイルより優先されるので、テストを実行するシェルで開発用の `APP_ENV` や `DATABASE_URL` を export しないで
 ください。テスト用データベースは、両方のプロセスから開けるデータベースで
 なければなりません。つまり、データベースサーバーか SQLite のファイルで、`:memory:` は使えません。`'dsn'`

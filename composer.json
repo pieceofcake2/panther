@@ -14,9 +14,9 @@
     },
     "require-dev": {
         "cakephp/cakephp-codesniffer": "^5.0",
-        "josegonzalez/dotenv": "^4.0",
         "phpstan/phpstan": "^2.1",
-        "pieceofcake2/phpstan-cakephp2": "^1.0"
+        "pieceofcake2/phpstan-cakephp2": "^1.0",
+        "symfony/dotenv": "^5.4 || ^6.4 || ^7.0 || ^8.0"
     },
     "suggest": {
         "dbrekelmans/bdi": "Downloads a chromedriver that matches the installed Chrome into drivers/, where Panther finds it (vendor/bin/bdi detect drivers)"
