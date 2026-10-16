@@ -59,5 +59,7 @@ The web server inherits the environment variables of the test process: the ones 
 in `$_ENV` or `$_SERVER` (Symfony Process does not pass a variable that is only set with `putenv()`). Real
 environment variables reach the web server this way and win over `config/.env.test` there as well, for
 example `DATABASE_URL` set to `mysql://root:root@127.0.0.1:3306/test_app` or, for an
-SQLite file that both processes open, to `sqlite:///tmp/tests/end_to_end.sqlite` (relative to the project
-root).
+SQLite file that both processes open, to an absolute path such as
+`sqlite:////var/tmp/myapp/end_to_end.sqlite` (four slashes). Do not use a relative path
+(`sqlite:///tmp/...`): the tests resolve it from the project root, but the web server from the document root
+(`webroot/`), so the browser and the tests would use two different files.

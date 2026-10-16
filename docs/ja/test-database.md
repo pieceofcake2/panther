@@ -65,5 +65,7 @@ Web サーバーは、テストのプロセスの環境変数を引き継ぎま�
 `$_SERVER` にある変数です (Symfony Process は `putenv()` だけで設定された変数を渡しません)。実際の環境変数は
 この方法で Web サーバーに渡され、Web サーバーでも `config/.env.test` より優先されます。たとえば
 `DATABASE_URL` を `mysql://root:root@127.0.0.1:3306/test_app` に設定するか、両方の
-プロセスが開く SQLite ファイルなら `sqlite:///tmp/tests/end_to_end.sqlite` (プロジェクトルートからの相対パス)
-に設定します。
+プロセスが開く SQLite ファイルなら `sqlite:////var/tmp/myapp/end_to_end.sqlite` (スラッシュ 4 つ) のような
+絶対パスに設定します。相対パス (`sqlite:///tmp/...`) は使わないでください。テストはプロジェクトルートから、
+Web サーバーはドキュメントルート (`webroot/`) から解決するので、ブラウザーとテストで別のファイルを使うことに
+なります。
