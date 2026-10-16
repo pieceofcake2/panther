@@ -64,7 +64,18 @@ jobs:
           DB_TEST_PASSWORD: root
           DB_TEST_DATABASE: test_app
           PANTHER_NO_SANDBOX: 1
+          PANTHER_REPORT_PDF: tmp/end-to-end-report.pdf
         run: vendor/bin/phpunit --testsuite EndToEnd --log-junit end-to-end-junit.xml
+
+      # The test report of every run, passed or not; one file is uploaded as it is, without a zip
+      - name: Upload the test report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v7
+        with:
+          path: tmp/end-to-end-report.pdf
+          archive: false
+          retention-days: 30
+          if-no-files-found: error
 
       - name: Upload the error screenshots
         id: screenshots
@@ -87,6 +98,10 @@ jobs:
           artifact-url: ${{ steps.screenshots.outputs.artifact-url }}
           artifact-note: Screenshots of the failed tests are in the {artifact} artifact.
 ```
+
+`PANTHER_REPORT_PDF` で実行の[テスト報告書](report.md)を書き出し、次のステップでアップロードします。
+`archive: false` (actions/upload-artifact v7) により、Artifact は zip ではなく PDF そのもので、名前はファイル名に
+なります。`if-no-files-found: error` で、報告書が書き出されなかったときにジョブを失敗にします。
 
 `bdi` は [dbrekelmans/bdi](https://github.com/dbrekelmans/bdi) です。
 `composer require --dev dbrekelmans/bdi` で追加してください。GitHub のランナーでは

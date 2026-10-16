@@ -55,7 +55,18 @@ jobs:
           DB_TEST_PASSWORD: root
           DB_TEST_DATABASE: test_app
           PANTHER_NO_SANDBOX: 1
+          PANTHER_REPORT_PDF: tmp/end-to-end-report.pdf
         run: vendor/bin/phpunit --testsuite EndToEnd --log-junit end-to-end-junit.xml
+
+      # The test report of every run, passed or not; one file is uploaded as it is, without a zip
+      - name: Upload the test report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v7
+        with:
+          path: tmp/end-to-end-report.pdf
+          archive: false
+          retention-days: 30
+          if-no-files-found: error
 
       - name: Upload the error screenshots
         id: screenshots

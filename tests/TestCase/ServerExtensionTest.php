@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace PieceOfCake2\Panther\Test;
 
 use PHPUnit\Framework\TestCase;
+use PieceOfCake2\Panther\Report\Recorder;
 use PieceOfCake2\Panther\ServerExtension;
 use PieceOfCake2\Panther\TestSuite\PantherTestCase;
 
@@ -24,6 +25,49 @@ class ServerExtensionTest extends TestCase
             $this->assertFalse(PantherTestCase::$stopServerOnTeardown);
         } finally {
             PantherTestCase::$stopServerOnTeardown = $previous;
+        }
+    }
+
+    public function testRecordsTheRunWithPantherReportPdf(): void
+    {
+        $previous = Recorder::setCurrent(null);
+        $server = $_SERVER;
+        $stop = PantherTestCase::$stopServerOnTeardown;
+        $pdf = TMP . 'report-' . bin2hex(random_bytes(4)) . '.pdf';
+        $_SERVER['PANTHER_REPORT_PDF'] = $pdf;
+        // A language without messages: the report fails after the tests, which does not change their result
+        $_SERVER['PANTHER_REPORT_LANGUAGE'] = 'xx';
+        try {
+            $extension = new ServerExtension();
+            $extension->executeBeforeFirstTest();
+            $recorder = Recorder::current();
+            $this->assertNotNull($recorder);
+            $this->assertSame($pdf, $recorder->config()->pdf);
+            $this->assertDirectoryExists($recorder->dir());
+
+            $extension->executeAfterLastTest();
+
+            $this->assertNull(Recorder::current());
+            $this->assertFileDoesNotExist($pdf);
+            $this->assertDirectoryDoesNotExist($recorder->dir());
+        } finally {
+            $_SERVER = $server;
+            PantherTestCase::$stopServerOnTeardown = $stop;
+            Recorder::setCurrent($previous);
+        }
+    }
+
+    public function testNoRecordingWithoutPantherReportPdf(): void
+    {
+        $previous = Recorder::setCurrent(null);
+        $stop = PantherTestCase::$stopServerOnTeardown;
+        try {
+            (new ServerExtension())->executeBeforeFirstTest();
+
+            $this->assertNull(Recorder::current());
+        } finally {
+            PantherTestCase::$stopServerOnTeardown = $stop;
+            Recorder::setCurrent($previous);
         }
     }
 

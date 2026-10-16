@@ -79,7 +79,18 @@ jobs:
         if: ${{ !cancelled() }}
         env:
           PANTHER_NO_SANDBOX: 1
+          PANTHER_REPORT_PDF: tmp/end-to-end-report-php${{ matrix.php-version }}.pdf
         run: ./vendor/bin/phpunit --testsuite EndToEnd --coverage-clover coverage-end-to-end.xml --log-junit junit-end-to-end.xml --colors=always
+
+      # The test report of the End-to-End tests, as a PDF (not a zip)
+      - name: Upload the test report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v7
+        with:
+          path: tmp/end-to-end-report-php${{ matrix.php-version }}.pdf
+          archive: false
+          retention-days: 7
+          if-no-files-found: error
 
       - name: Unit test summary
         if: ${{ !cancelled() }}
