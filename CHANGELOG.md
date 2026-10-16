@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## 1.1.0
+## 1.0.2
 
 - Test report: with `PANTHER_REPORT_PDF`, `ServerExtension` writes a PDF report of the End-to-End tests after the
   last test, with the results of all the tests, passed or not, and screenshots of the pages (docs/report.md).
@@ -8,9 +8,11 @@
   languages with `PANTHER_REPORT_LOCALE_DIR`), with the titles of `@testdox` or the doc comments of the tests,
   and the repository, branch, commit and run of GitHub Actions or of the local Git
 - `PantherTestCase::takeReportScreenshot()` takes a screenshot of a step for the report: the viewport, the
-  viewport scrolled to an element, what fits on a page of the report, or the whole page in parts of the same
-  height. A test that takes none gets the screenshot of its end, and a failed test the screenshot of its failure,
-  taken before `tearDown()`
+  viewport scrolled to an element, what fits on a page of the report, or the whole page, which the report goes on
+  with on the next page between two of its rows. A test that takes none gets the screenshot of its end, and a failed
+  test the screenshot of its failure, taken before `tearDown()`
+- Docs: the test database is `DATABASE_URL` of `config/.env.test`, which the tests and the web server load with
+  `APP_ENV=test` (the default of the tests of pieceofcake2/app), instead of `DATABASE_TEST_URL`
 - CI example (docs): the job uploads the report as a PDF, not a zip (`archive: false` of actions/upload-artifact),
   and its summary links to it. The examples no longer set `PANTHER_ERROR_SCREENSHOT_DIR`: the report has the
   screenshots of all the tests
