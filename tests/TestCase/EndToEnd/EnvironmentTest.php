@@ -30,7 +30,7 @@ class EnvironmentTest extends PantherTestCase
 
         $this->assertSame(
             ['server' => 'from-the-test', 'env' => 'from-the-test'],
-            json_decode($client->getWebDriver()->executeScript('return document.body.innerText;'), true),
+            json_decode($client->executeScript('return document.body.innerText;'), true),
         );
     }
 }
