@@ -12,7 +12,7 @@ port. Stop it, or set `PANTHER_WEB_SERVER_PORT`. For chromedriver (`9515`), pass
 
 **`Missing Database Table` in the browser** — The web server does not use the test database: check
 that the tests run with `APP_ENV=test` (no other `APP_ENV` in the environment), that `DATABASE_URL` in
-`config/.env.test` (or in the real environment) is the test database, and that the test database is not an
+`config/.env.test` or `config/.env.test.local` (or in the real environment) is the test database, and that the test database is not an
 in-memory SQLite database.
 
 **The browser and the tests use different files (for example two SQLite databases)** — A relative path is
@@ -25,10 +25,12 @@ in the document root. Run PHPUnit from the project root, or use absolute paths.
 set only with `putenv()` is not passed.
 
 **The web server gets a value from `.env` instead of the environment** — The environment of the web server is
-built from `$_ENV` first, then from `getenv()`. When the tests load a `.env` file into `$_ENV` (for example with
-josegonzalez/dotenv's `toEnv()`), and PHP does not fill `$_ENV` itself (`variables_order` without `E`, as on
-the GitHub runners), the web server gets the `.env` values even where the shell sets other ones, such as the
-URL of the test database in CI. Pass such values with the `env` option:
+built from `$_ENV` first, then from `getenv()`. A `.env` loader that writes to `$_ENV` without checking the real
+environment variables (for example josegonzalez/dotenv's `toEnv()`), when PHP does not fill `$_ENV` itself
+(`variables_order` without `E`, the default and on the GitHub runners), gives the web server the `.env` values
+even where the shell sets other ones, such as the URL of the test database in CI. Do not write `.env` values to
+`$_ENV` that way: symfony/dotenv's `bootEnv()`, which pieceofcake2/app uses, copies the real variables into
+`$_ENV` first and keeps them. Otherwise pass such values with the `env` option:
 `static::createPantherClient(['env' => ['DATABASE_URL' => (string)env('DATABASE_URL')]])`.
 
 **Japanese text is drawn as boxes in the screenshots** — The machine has no Japanese (CJK) font, as on the GitHub

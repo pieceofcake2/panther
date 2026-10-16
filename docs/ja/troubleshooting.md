@@ -11,8 +11,8 @@
 の場合は、`$managerOptions` で別の `port` を渡してください。
 
 **ブラウザーに `Missing Database Table` と表示される** — Web サーバーがテスト用データソースを
-使っていません。テストが `APP_ENV=test` で動いていること (環境変数にほかの `APP_ENV` が無いこと)、`config/.env.test`
-(または実際の環境変数) の `DATABASE_URL` がテスト用データベースであること、テスト用データベースがインメモリの
+使っていません。テストが `APP_ENV=test` で動いていること (環境変数にほかの `APP_ENV` が無いこと)、`config/.env.test` か
+`config/.env.test.local` (または実際の環境変数) の `DATABASE_URL` がテスト用データベースであること、テスト用データベースがインメモリの
 SQLite データベースでないことを確認してください。
 
 **ブラウザーとテストが別のファイルを使う (たとえば 2 つの SQLite データベース)** — 相対パスは作業ディレクトリから
@@ -25,10 +25,12 @@ SQLite データベースでないことを確認してください。
 `putenv()` だけで設定した変数は渡されません。
 
 **Web サーバーが、環境変数ではなく `.env` の値になる** — Web サーバーの環境変数は、`$_ENV` から先に、次に
-`getenv()` から作られます。テストが `.env` ファイルを `$_ENV` に読み込み (たとえば josegonzalez/dotenv の `toEnv()`)、
-PHP 自身が `$_ENV` を埋めない場合 (GitHub のランナーのように `variables_order` に `E` が無い場合)、CI のテスト用 DB の
-URL のようにシェルで別の値を設定していても、Web サーバーには `.env` の値が渡ります。このような値は `env` オプションで渡して
-ください: `static::createPantherClient(['env' => ['DATABASE_URL' => (string)env('DATABASE_URL')]])`。
+`getenv()` から作られます。実際の環境変数を確認せずに `$_ENV` に書き込む `.env` の読み込み処理 (たとえば
+josegonzalez/dotenv の `toEnv()`) では、PHP 自身が `$_ENV` を埋めない場合 (`variables_order` に `E` が無い場合。
+デフォルトと GitHub のランナーがこれに当たります)、CI のテスト用 DB の URL のようにシェルで別の値を設定していても、
+Web サーバーには `.env` の値が渡ります。そのような方法で `.env` の値を `$_ENV` に書き込まないでください。
+pieceofcake2/app が使う symfony/dotenv の `bootEnv()` は、先に実際の環境変数を `$_ENV` にコピーして残します。
+そうできない場合は、このような値を `env` オプションで渡してください: `static::createPantherClient(['env' => ['DATABASE_URL' => (string)env('DATABASE_URL')]])`。
 
 **スクリーンショットの日本語が四角 (豆腐) で表示される** — GitHub のランナーのように、日本語 (CJK) のフォントが
 入っていません。たとえば `sudo apt-get install -y fonts-noto-cjk` で入れてください ([CI](ci.md) をご覧ください)。

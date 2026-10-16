@@ -10,6 +10,10 @@
   own gets the variable too
 - Docs: relative paths in the test database (docs/test-database.md#relative-paths), instead of an absolute SQLite
   path
+- Docs: pieceofcake2/app loads its `.env` files with symfony/dotenv as Symfony does, so `config/.env.test.local`
+  needs only the variables you change; troubleshooting: a `.env` loader must not write `.env` values over real
+  environment variables in `$_ENV`, which the web server gets its environment from first. The fixture application
+  loads its `.env` files the same way (symfony/dotenv replaces josegonzalez/dotenv in require-dev)
 
 ## 1.0.2
 

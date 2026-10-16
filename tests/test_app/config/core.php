@@ -3,40 +3,15 @@
  * Configuration of the fixture application
  */
 
-use josegonzalez\Dotenv\Loader;
+use Symfony\Component\Dotenv\Dotenv;
 
 /**
- * Loads config/.env.{APP_ENV}.local and config/.env.{APP_ENV}, as config/core.php of pieceofcake2/app (which
- * also loads config/.env.local, config/.env and .env; the fixture application needs only these). The tests
- * run with APP_ENV=test (tests/bootstrap.php), and the web server inherits it, so both processes load the
- * committed config/.env.test. A variable that is already defined is never overwritten: real environment
- * variables win over the files, and earlier files win over later ones.
+ * Loads config/.env, config/.env.local, config/.env.{APP_ENV} and config/.env.{APP_ENV}.local, as
+ * config/core.php of pieceofcake2/app (Symfony's model). The tests run with APP_ENV=test
+ * (tests/bootstrap.php), and the web server inherits it, so both processes load the committed
+ * config/.env.test. Real environment variables win over the files.
  */
-$appEnv = (string)env('APP_ENV');
-if ($appEnv !== '') {
-    foreach ([__DIR__ . DS . ".env.{$appEnv}.local", __DIR__ . DS . ".env.{$appEnv}"] as $dotenvFile) {
-        if (!is_file($dotenvFile)) {
-            continue;
-        }
-        $dotenv = new Loader([$dotenvFile]);
-        foreach ($dotenv->parse()->toArray() as $key => $value) {
-            if (getenv($key) !== false || isset($_ENV[$key]) || isset($_SERVER[$key])) {
-                continue;
-            }
-            // The parser converts some values to booleans, numbers or null; keep them as strings.
-            if (is_bool($value)) {
-                $value = $value ? 'true' : 'false';
-            }
-            $value = (string)$value;
-            putenv($key . '=' . $value);
-            $_ENV[$key] = $value;
-            $_SERVER[$key] = $value;
-        }
-        unset($dotenv, $key, $value);
-    }
-    unset($dotenvFile);
-}
-unset($appEnv);
+(new Dotenv())->usePutenv()->bootEnv(CONFIG . '.env');
 
 Configure::write('debug', (int)env('DEBUG'));
 Configure::write('Error', [

@@ -18,7 +18,7 @@ if ((string)getenv('APP_ENV') === '' && empty($_SERVER['APP_ENV'])) {
 
 The tests run with `APP_ENV=test`, and the web server that Panther starts inherits the environment of the
 test process, so it runs with `APP_ENV=test` too. pieceofcake2/app then loads `config/.env.test` in both
-processes (the `.env.{APP_ENV}` file of Symfony). It is committed and sets `DATABASE_URL` to the test
+processes, after `config/.env` (the `.env.{APP_ENV}` file of Symfony). It is committed and sets `DATABASE_URL` to the test
 database. As in Symfony, there is one variable: `DATABASE_URL` is the database of the current environment.
 
 ```dotenv
@@ -37,8 +37,9 @@ public function __construct()
 }
 ```
 
-Set your own test database in `config/.env.test.local` (ignored by Git) or as a real environment variable,
-which wins over `config/.env.test` (CI sets `DATABASE_URL` this way). Do not export your development
+Set your own test database in `config/.env.test.local` (ignored by Git), which is loaded after
+`config/.env.test` and needs only the variables you change, such as `DATABASE_URL`, or as a real environment
+variable, which wins over the files (CI sets `DATABASE_URL` this way). Do not export your development
 `APP_ENV` or `DATABASE_URL` in the shell where you run the tests: they win over the files too. The test database must be a database both processes can open: a database
 server, or an SQLite file, not `:memory:`. The `'dsn'` key needs pieceofcake2/cakephp 2.12.7 or later.
 
