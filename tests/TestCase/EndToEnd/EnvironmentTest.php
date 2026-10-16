@@ -33,4 +33,22 @@ class EnvironmentTest extends PantherTestCase
             json_decode($client->executeScript('return document.body.innerText;'), true),
         );
     }
+
+    public function testDefaultOptionsEnvIsPassedToTheWebServer(): void
+    {
+        static::stopWebServer();
+        $default = static::$defaultOptions['env'];
+        static::$defaultOptions['env'] = ['PANTHER_FIXTURE_VALUE' => 'from-the-default-options'];
+        try {
+            $client = static::createPantherClient();
+            $client->request('GET', '/environment/show/PANTHER_FIXTURE_VALUE');
+
+            $this->assertSame(
+                ['server' => 'from-the-default-options', 'env' => 'from-the-default-options'],
+                json_decode($client->executeScript('return document.body.innerText;'), true),
+            );
+        } finally {
+            static::$defaultOptions['env'] = $default;
+        }
+    }
 }
