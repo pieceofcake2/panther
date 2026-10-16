@@ -27,3 +27,4 @@ phpunit.xml
 /drivers
 /tests/test_app/tmp
 /tests/test_app/logs
+/tests/test_app/config/.env.*.local

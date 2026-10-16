@@ -2,9 +2,10 @@
 /**
  * Datasources of the fixture application
  *
- * Both are SQLite file databases, so the web server and the test process share them (`:memory:` cannot be
- * shared between processes). tests/bootstrap.php sets `TEST_APP_DATABASE` to a file of its own for each
- * run; the web server inherits it.
+ * As in pieceofcake2/app, DATABASE_URL is the database of the current environment and sets both
+ * connections. The tests run with APP_ENV=test, so config/core.php loads config/.env.test, where it is an
+ * SQLite file database; the web server inherits APP_ENV=test and loads the same file, so its `default`
+ * connection is the database of the fixtures.
  */
 
 class DATABASE_CONFIG
@@ -26,18 +27,11 @@ class DATABASE_CONFIG
     ];
 
     /**
-     * Uses the file database, and the `test` datasource as `default` when `APP_ENV` is `test`: Panther passes
-     * `PANTHER_APP_ENV` (`test` in phpunit.xml.dist) to the web server as `APP_ENV`.
+     * Reads both connections from DATABASE_URL.
      */
     public function __construct()
     {
-        $file = env('TEST_APP_DATABASE');
-        if ($file) {
-            $this->default['database'] = $file . '.default';
-            $this->test['database'] = $file;
-        }
-        if (env('APP_ENV') === 'test') {
-            $this->default = $this->test;
-        }
+        $this->default['dsn'] = env('DATABASE_URL');
+        $this->test['dsn'] = env('DATABASE_URL');
     }
 }
