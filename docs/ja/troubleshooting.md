@@ -17,6 +17,12 @@
 **変数が Web サーバーに渡らない** — シェルで設定するか、`$_ENV` または `$_SERVER` に設定してください。
 `putenv()` だけで設定した変数は渡されません。
 
+**Web サーバーが、環境変数ではなく `.env` の値になる** — Web サーバーの環境変数は、`$_ENV` から先に、次に
+`getenv()` から作られます。テストが `.env` ファイルを `$_ENV` に読み込み (たとえば josegonzalez/dotenv の `toEnv()`)、
+PHP 自身が `$_ENV` を埋めない場合 (GitHub のランナーのように `variables_order` に `E` が無い場合)、CI のテスト用 DB の
+URL のようにシェルで別の値を設定していても、Web サーバーには `.env` の値が渡ります。このような値は `env` オプションで渡して
+ください: `static::createPantherClient(['env' => ['DATABASE_TEST_URL' => (string)env('DATABASE_TEST_URL')]])`。
+
 **スクリーンショットの日本語が四角 (豆腐) で表示される** — GitHub のランナーのように、日本語 (CJK) のフォントが
 入っていません。たとえば `sudo apt-get install -y fonts-noto-cjk` で入れてください ([CI](ci.md) をご覧ください)。
 
