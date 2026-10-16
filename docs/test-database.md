@@ -34,5 +34,5 @@ in `$_ENV` or `$_SERVER` (Symfony Process does not pass a variable that is only 
 `DATABASE_TEST_URL` variable of pieceofcake2/app reaches the web server this way, for example
 `DATABASE_TEST_URL="mysql://root:root@127.0.0.1:3306/test_app"` or, for an SQLite file that both processes
 open, `DATABASE_TEST_URL="sqlite:///tmp/tests/end_to_end.sqlite"` (relative to the project root). The
-`'dsn'` key that reads it needs the release of pieceofcake2/cakephp after 2.12.6; applications created from an earlier
+`'dsn'` key that reads it needs pieceofcake2/cakephp 2.12.7 or later; applications created from an earlier
 skeleton set the `DB_TEST_*` variables instead.

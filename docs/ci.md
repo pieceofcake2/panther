@@ -79,6 +79,6 @@ jobs:
 
 `bdi` is [dbrekelmans/bdi](https://github.com/dbrekelmans/bdi); add it with
 `composer require --dev dbrekelmans/bdi`. `PANTHER_NO_SANDBOX=1` is needed on the GitHub runners.
-`DATABASE_TEST_URL` sets the `test` connection of pieceofcake2/app's `config/database.php` (with the
-release of pieceofcake2/cakephp after 2.12.6), which the web server uses as `default`; see
+`DATABASE_TEST_URL` sets the `test` connection of pieceofcake2/app's `config/database.php` (with
+pieceofcake2/cakephp 2.12.7 or later), which the web server uses as `default`; see
 [Test Database](test-database.md).

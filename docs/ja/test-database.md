@@ -39,5 +39,5 @@ Web サーバーは、テストのプロセスの環境変数を引き継ぎま�
 pieceofcake2/app の `DATABASE_TEST_URL` 変数は、この方法で Web サーバーに渡されます。たとえば
 `DATABASE_TEST_URL="mysql://root:root@127.0.0.1:3306/test_app"` や、両方のプロセスが開く SQLite ファイルなら
 `DATABASE_TEST_URL="sqlite:///tmp/tests/end_to_end.sqlite"` (プロジェクトルートからの相対パス) のように設定します。
-これを読み込む `'dsn'` キーには、2.12.6 の次のリリース以降の pieceofcake2/cakephp が必要です。以前のスケルトンから
+これを読み込む `'dsn'` キーには、pieceofcake2/cakephp 2.12.7 以降が必要です。以前のスケルトンから
 作成したアプリケーションでは、代わりに `DB_TEST_*` 変数を設定します。
