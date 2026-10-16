@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## Unreleased
+## 1.0.4
 
 - `PantherTestCase::startWebServer()` uses `$defaultOptions['env']` again when the `env` option is not given.
   Since 1.0.3 it always set the `env` option to pass `PANTHER_WORKING_DIR`, so Panther ignored the variables of
