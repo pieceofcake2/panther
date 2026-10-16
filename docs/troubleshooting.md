@@ -17,6 +17,13 @@ that the test datasource is not an in-memory SQLite database.
 **A variable does not reach the web server** — Set it in the shell, or in `$_ENV` or `$_SERVER`; a variable
 set only with `putenv()` is not passed.
 
+**The web server gets a value from `.env` instead of the environment** — The environment of the web server is
+built from `$_ENV` first, then from `getenv()`. When the tests load a `.env` file into `$_ENV` (for example with
+josegonzalez/dotenv's `toEnv()`), and PHP does not fill `$_ENV` itself (`variables_order` without `E`, as on
+the GitHub runners), the web server gets the `.env` values even where the shell sets other ones, such as the
+URL of the test database in CI. Pass such values with the `env` option:
+`static::createPantherClient(['env' => ['DATABASE_TEST_URL' => (string)env('DATABASE_TEST_URL')]])`.
+
 **The page has no CSS** — The file is not in the document root, or `PANTHER_WEB_SERVER_DIR` points to the
 wrong directory.
 

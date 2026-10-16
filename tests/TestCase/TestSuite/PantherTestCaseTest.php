@@ -48,6 +48,15 @@ class PantherTestCaseTest extends TestCase
         $this->assertSame(dirname(__DIR__, 3) . DIRECTORY_SEPARATOR . 'webroot', TestPantherTestCase::webServerDirOf(null));
     }
 
+    public function testScreenshotNameReplacesCharactersNotAllowedInArtifacts(): void
+    {
+        $this->assertSame(
+            'App\\Test\\FooTest::testBar with data set _a_b_ (_x_y_)',
+            PantherTestCase::screenshotName('App\\Test\\FooTest::testBar with data set "a/b" (<x|y>)'),
+        );
+        $this->assertSame('FooTest::testBar_with__', PantherTestCase::screenshotName("FooTest::testBar\nwith*?"));
+    }
+
     public function testRouter(): void
     {
         $this->assertFileExists(PantherTestCase::ROUTER);

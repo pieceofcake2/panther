@@ -5,7 +5,9 @@ namespace PieceOfCake2\Panther\TestSuite;
 
 use CakeTestCase;
 use Composer\InstalledVersions;
+use PHPUnit\Runner\BaseTestRunner;
 use Symfony\Component\Panther\PantherTestCaseTrait;
+use Symfony\Component\Panther\ServerExtensionLegacy;
 
 /**
  * Base class for End-to-End tests of a CakePHP 2 application with Symfony Panther.
@@ -64,6 +66,39 @@ abstract class PantherTestCase extends CakeTestCase
     {
         parent::tearDown();
         $this->takeScreenshotIfTestFailed();
+    }
+
+    /**
+     * Takes the screenshots of a failed test like Panther, with a file name that can be uploaded as a CI artifact.
+     *
+     * Panther names the file after the test, and the name of a test with a data provider contains the data set
+     * in quotes (`with data set "name"`). `"`, `<`, `>`, `|`, `*`, `?` and line breaks are not allowed in the
+     * file names of GitHub Actions artifacts (or on Windows), so they are replaced with `_`.
+     *
+     * @return void
+     */
+    public function takeScreenshotIfTestFailed(): void
+    {
+        $status = $this->getStatus();
+        if ($status !== BaseTestRunner::STATUS_ERROR && $status !== BaseTestRunner::STATUS_FAILURE) {
+            return;
+        }
+
+        ServerExtensionLegacy::takeScreenshots(
+            $status === BaseTestRunner::STATUS_ERROR ? 'error' : 'failure',
+            static::screenshotName($this->toString()),
+        );
+    }
+
+    /**
+     * The test name used in the file name of a screenshot
+     *
+     * @param string $test Name of the test, e.g. `App\FooTest::testBar with data set "baz"`
+     * @return string
+     */
+    public static function screenshotName(string $test): string
+    {
+        return (string)preg_replace('/["<>|*?\r\n\/]/', '_', $test);
     }
 
     /**
