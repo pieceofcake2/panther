@@ -19,6 +19,16 @@ The report is A4, with a header and page numbers on every page:
 Only the tests of `PantherTestCase` are in the report, as PHPUnit counts them: a test that a test runs itself
 is not.
 
+## Sample
+
+The report of the tests of [docs/examples/report](https://github.com/pieceofcake2/panther/tree/1.x/docs/examples/report) on the fixture application of this package:
+steps, a full page, a phone, a data provider, and a test that fails and one that is skipped on purpose.
+
+- [Sample report (English, PDF)](/report-sample.pdf)
+- [Sample report (Japanese, PDF)](/report-sample-ja.pdf)
+
+![The cover, the list of the tests, a test with its steps, and a failed test](img/report-sample.png)
+
 ## Requirements
 
 - The extension, `PieceOfCake2\Panther\ServerExtension` ([Configuration](configuration.md#phpunitxmldist))

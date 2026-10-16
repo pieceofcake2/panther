@@ -19,6 +19,19 @@ PANTHER_REPORT_PDF=tmp/end-to-end-report.pdf vendor/bin/phpunit --testsuite EndT
 報告書に載るのは `PantherTestCase` のテストで、PHPUnit が数えるものと同じです。テストの中で実行した
 テストは載りません。
 
+<a id="sample"></a>
+
+## 見本
+
+このパッケージのテスト用アプリケーションで、[docs/examples/report](https://github.com/pieceofcake2/panther/tree/1.x/docs/examples/report) のテストを実行して作った
+報告書です。途中の画面・ページ全体・スマホ・データプロバイダーのほか、見本として失敗するテストとスキップする
+テストを 1 つずつ含みます。
+
+- [見本の報告書 (日本語、PDF)](/report-sample-ja.pdf)
+- [見本の報告書 (英語、PDF)](/report-sample.pdf)
+
+![表紙、テスト一覧、途中の画面を撮ったテスト、失敗したテストのページ](../img/report-sample-ja.png)
+
 <a id="requirements"></a>
 
 ## 必要なもの
