@@ -11,7 +11,7 @@ port. Stop it, or set `PANTHER_WEB_SERVER_PORT`. For chromedriver (`9515`), pass
 `$managerOptions`.
 
 **`Missing Database Table` in the browser** — The web server does not use the test database: check
-`<env name="APP_ENV" value="test" force="true"/>` in `phpunit.xml.dist`, that `DATABASE_URL` in
+that `tests/bootstrap.php` sets `APP_ENV=test`, that `DATABASE_URL` in
 `config/.env.test` (or in the real environment) is the test database, and that the test database is not an
 in-memory SQLite database.
 
@@ -23,7 +23,7 @@ built from `$_ENV` first, then from `getenv()`. When the tests load a `.env` fil
 josegonzalez/dotenv's `toEnv()`), and PHP does not fill `$_ENV` itself (`variables_order` without `E`, as on
 the GitHub runners), the web server gets the `.env` values even where the shell sets other ones, such as the
 URL of the test database in CI. Pass such values with the `env` option:
-`static::createPantherClient(['env' => ['DATABASE_TEST_URL' => (string)env('DATABASE_TEST_URL')]])`.
+`static::createPantherClient(['env' => ['DATABASE_URL' => (string)env('DATABASE_URL')]])`.
 
 **Japanese text is drawn as boxes in the screenshots** — The machine has no Japanese (CJK) font, as on the GitHub
 runners. Install one, e.g. `sudo apt-get install -y fonts-noto-cjk` (see [CI](ci.md)).

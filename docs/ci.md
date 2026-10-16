@@ -58,7 +58,6 @@ jobs:
       - name: Run End-to-End tests
         env:
           DATABASE_URL: mysql://root:root@127.0.0.1:3306/test_app
-          DATABASE_TEST_URL: mysql://root:root@127.0.0.1:3306/test_app
           PANTHER_NO_SANDBOX: 1
         run: vendor/bin/phpunit --testsuite EndToEnd --log-junit end-to-end-junit.xml
 
@@ -86,6 +85,6 @@ jobs:
 
 `bdi` is [dbrekelmans/bdi](https://github.com/dbrekelmans/bdi); add it with
 `composer require --dev dbrekelmans/bdi`. `PANTHER_NO_SANDBOX=1` is needed on the GitHub runners. The runners have no Japanese (CJK) fonts, so the example installs `fonts-noto-cjk`; without it, Japanese text is drawn as boxes in the screenshots. Leave the step out if your pages have no CJK text.
-`DATABASE_URL` and `DATABASE_TEST_URL` are real environment variables, so they win over pieceofcake2/app's
-`config/.env.test` in the tests and in the web server, which inherits them (the `'dsn'` key needs
+`DATABASE_URL` is a real environment variable, so it wins over pieceofcake2/app's
+`config/.env.test` in the tests and in the web server, which inherits it (the `'dsn'` key needs
 pieceofcake2/cakephp 2.12.7 or later); see [Test Database](test-database.md).

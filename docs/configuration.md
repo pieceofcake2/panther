@@ -5,14 +5,12 @@ options of `createPantherClient()`.
 
 ## phpunit.xml.dist
 
-Register the extension, set the test environment and add an `EndToEnd` suite
+Register the extension and add an `EndToEnd` suite
 ([docs/examples/phpunit.xml.dist](examples/phpunit.xml.dist)):
 
 ```xml
 <phpunit bootstrap="./tests/bootstrap.php" defaultTestSuite="App">
     <php>
-        <!-- The tests and the web server load .env.test, where the database is the test database -->
-        <env name="APP_ENV" value="test" force="true"/>
         <!-- Screenshots of the failed End-to-End tests -->
         <server name="PANTHER_ERROR_SCREENSHOT_DIR" value="./tmp/error-screenshots"/>
     </php>
@@ -34,9 +32,9 @@ Register the extension, set the test environment and add an `EndToEnd` suite
 </phpunit>
 ```
 
-`APP_ENV` is an `<env>` element, as in Symfony's `phpunit.xml.dist`: PHPUnit puts it into `putenv()` and
-`$_ENV`, so the tests load `config/.env.test` of pieceofcake2/app, and the web server inherits it and loads
-the same file ([Test Database](test-database.md#the-test-environment)).
+`APP_ENV=test` is set by `tests/bootstrap.php` of pieceofcake2/app before CakePHP loads the `.env` files, so
+the tests load `config/.env.test`, and the web server inherits it and loads the same file
+([Test Database](test-database.md#the-test-environment)).
 
 Like Panther, the package reads its settings from `$_SERVER`, so they are `<server>` elements, as in the
 Symfony documentation. A variable of your shell is in `$_SERVER` too, but a `<server>` element replaces it:

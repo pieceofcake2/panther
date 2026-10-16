@@ -8,8 +8,10 @@
          colors="true">
     <php>
         <ini name="memory_limit" value="-1"/>
-        <!-- The tests and the web server load .env.test, where the database is the test database -->
-        <env name="APP_ENV" value="test" force="true"/>
+        <!--
+            tests/bootstrap.php sets APP_ENV=test: the tests and the web server load .env.test, where
+            DATABASE_URL is the test database
+        -->
         <!-- Screenshots of the failed End-to-End tests -->
         <server name="PANTHER_ERROR_SCREENSHOT_DIR" value="./tmp/error-screenshots"/>
     </php>

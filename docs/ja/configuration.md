@@ -7,14 +7,12 @@ End-to-End テストは Symfony Panther と同じように、`PANTHER_*` 環境�
 
 ## phpunit.xml.dist
 
-拡張を登録し、テスト環境を設定して、`EndToEnd` スイートを追加します
+拡張を登録し、`EndToEnd` スイートを追加します
 ([docs/examples/phpunit.xml.dist](../examples/phpunit.xml.dist))。
 
 ```xml
 <phpunit bootstrap="./tests/bootstrap.php" defaultTestSuite="App">
     <php>
-        <!-- The tests and the web server load .env.test, where the database is the test database -->
-        <env name="APP_ENV" value="test" force="true"/>
         <!-- Screenshots of the failed End-to-End tests -->
         <server name="PANTHER_ERROR_SCREENSHOT_DIR" value="./tmp/error-screenshots"/>
     </php>
@@ -36,9 +34,9 @@ End-to-End テストは Symfony Panther と同じように、`PANTHER_*` 環境�
 </phpunit>
 ```
 
-`APP_ENV` は、Symfony の `phpunit.xml.dist` と同じく `<env>` 要素です。PHPUnit はこれを `putenv()` と `$_ENV` に
-設定するので、テストは pieceofcake2/app の `config/.env.test` を読み込み、Web サーバーもそれを引き継いで同じ
-ファイルを読み込みます ([テスト用データベース](test-database.md#the-test-environment))。
+`APP_ENV=test` は、CakePHP が `.env` ファイルを読み込む前に pieceofcake2/app の `tests/bootstrap.php` が
+設定します。そのため、テストは `config/.env.test` を読み込み、Web サーバーもそれを引き継いで同じファイルを
+読み込みます ([テスト用データベース](test-database.md#the-test-environment))。
 
 このパッケージは Panther と同じように `$_SERVER` から設定を読み込むので、Symfony のドキュメントと同じく
 設定は `<server>` 要素で指定します。シェルの変数も `$_SERVER` に入りますが、`<server>` 要素はそれを
