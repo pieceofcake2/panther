@@ -63,7 +63,18 @@ jobs:
           DB_TEST_PASSWORD: root
           DB_TEST_DATABASE: test_app
           PANTHER_NO_SANDBOX: 1
+          PANTHER_REPORT_PDF: tmp/end-to-end-report.pdf
         run: vendor/bin/phpunit --testsuite EndToEnd --log-junit end-to-end-junit.xml
+
+      # The test report of every run, passed or not; one file is uploaded as it is, without a zip
+      - name: Upload the test report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v7
+        with:
+          path: tmp/end-to-end-report.pdf
+          archive: false
+          retention-days: 30
+          if-no-files-found: error
 
       - name: Upload the error screenshots
         id: screenshots
@@ -86,6 +97,10 @@ jobs:
           artifact-url: ${{ steps.screenshots.outputs.artifact-url }}
           artifact-note: Screenshots of the failed tests are in the {artifact} artifact.
 ```
+
+`PANTHER_REPORT_PDF` writes the [test report](report.md) of the run, and the next step uploads it: with
+`archive: false` (actions/upload-artifact v7), the artifact is the PDF itself, not a zip, named after the file.
+`if-no-files-found: error` makes the job fail when the report was not written.
 
 `bdi` is [dbrekelmans/bdi](https://github.com/dbrekelmans/bdi); add it with
 `composer require --dev dbrekelmans/bdi`. `PANTHER_NO_SANDBOX=1` is needed on the GitHub runners. The runners have no Japanese (CJK) fonts, so the example installs `fonts-noto-cjk`; without it, Japanese text is drawn as boxes in the screenshots. Leave the step out if your pages have no CJK text.

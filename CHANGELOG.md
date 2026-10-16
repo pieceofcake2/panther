@@ -1,5 +1,17 @@
 # CHANGELOG
 
+## 1.1.0
+
+- Test report: with `PANTHER_REPORT_PDF`, `ServerExtension` writes a PDF report of the End-to-End tests after the
+  last test, with the results of all the tests, passed or not, and screenshots of the pages (docs/report.md).
+  It is printed by a headless Chrome of its own, in English or Japanese (`PANTHER_REPORT_LANGUAGE`, more
+  languages with `PANTHER_REPORT_LOCALE_DIR`), with the titles of `@testdox` or the doc comments of the tests,
+  and the repository, branch, commit and run of GitHub Actions or of the local Git
+- `PantherTestCase::takeReportScreenshot()` takes a screenshot of a step for the report: the viewport, the
+  viewport scrolled to an element, or the whole page. A test that takes none gets the screenshot of its end, and
+  a failed test the screenshot of its failure, taken before `tearDown()`
+- CI example (docs): the job uploads the report as a PDF, not a zip (`archive: false` of actions/upload-artifact)
+
 ## 1.0.1
 
 - `resources/router.php` copies the environment variables of the web server into `$_SERVER` and `$_ENV`, as Apache

@@ -7,6 +7,7 @@ way Symfony applications run them.
 - [Writing Tests](writing-tests.md)
 - [Configuration](configuration.md)
 - [Test Database](test-database.md)
+- [Test Report](report.md)
 - [CI with GitHub Actions](ci.md)
 - [Troubleshooting](troubleshooting.md)
 

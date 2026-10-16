@@ -82,6 +82,8 @@ PANTHER_WEB_SERVER_PORT=9180 vendor/bin/phpunit --testsuite EndToEnd
 | `PANTHER_CHROME_BINARY` | 使用する Chrome のバイナリ |
 | `PANTHER_FIREFOX_ARGUMENTS`、`PANTHER_FIREFOX_BINARY` | Firefox 用の同じ設定 |
 
+このパッケージの `PANTHER_REPORT_*` 変数は、テストの報告書を PDF で書き出します。[テスト報告書](report.md#settings) を参照してください。
+
 <a id="createpantherclient-options"></a>
 
 ## createPantherClient() のオプション

@@ -76,6 +76,8 @@ or with `<server>` in `phpunit.xml.dist`.
 | `PANTHER_CHROME_BINARY` | Chrome binary to use |
 | `PANTHER_FIREFOX_ARGUMENTS`, `PANTHER_FIREFOX_BINARY` | The same for Firefox |
 
+The `PANTHER_REPORT_*` variables of this package write a PDF report of the tests: see [Test Report](report.md#settings).
+
 ## createPantherClient() options
 
 `createPantherClient(array $options = [], array $kernelOptions = [], array $managerOptions = [])` is Panther's:

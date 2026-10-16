@@ -7,6 +7,7 @@ Symfony のアプリケーションと同じ方法でセットアップします
 - [テストを書く](writing-tests.md)
 - [設定](configuration.md)
 - [テスト用データベース](test-database.md)
+- [テスト報告書](report.md)
 - [GitHub Actions での CI](ci.md)
 - [トラブルシューティング](troubleshooting.md)
 
