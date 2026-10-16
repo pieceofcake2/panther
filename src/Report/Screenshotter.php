@@ -14,16 +14,38 @@ use Symfony\Component\Panther\Client;
  *
  * With Chrome, the screenshots are taken with the DevTools Protocol as JPEG images of 1 pixel per CSS pixel, so
  * that a page of a mobile emulation (`deviceScaleFactor` of 3) is not 9 times as large, and a full page is taken
- * in parts of the same height, at most `PART_HEIGHT` CSS pixels, so that a part fits on a page of the report. With another browser, they are the PNG
- * screenshots of WebDriver, of the viewport.
+ * in parts that fill the pages of the report: the first one what fits under the title of the test, the next ones
+ * what fits on a page, each cut between two rows of the page. With another browser, they are the PNG screenshots of
+ * WebDriver, of the viewport.
  */
 final class Screenshotter
 {
     /**
-     * The most height of a part of a full page (CSS pixels): about a page of A4 at the scale of the report.
-     * A page is split into parts of the same height, so that the last part is not a sliver
+     * Millimeters per CSS pixel of the screenshots in the report, the same for every mode: a viewport of 1200 x 957
+     * is 120 x 96 mm, so that two fit on a page
      */
-    public const PART_HEIGHT = 1500;
+    public const MM_PER_PIXEL = 0.1;
+
+    /**
+     * Millimeters per CSS pixel of the screenshots of a narrow viewport (a phone), whose text would be too small:
+     * a viewport of 390 x 844 is 55 x 118 mm
+     */
+    public const MM_PER_PIXEL_NARROW = 0.14;
+
+    /**
+     * A viewport narrower than this is a phone (CSS pixels), as the usual breakpoint of a tablet
+     */
+    public const NARROW_WIDTH = 768;
+
+    /**
+     * The height of the first part of a full page (mm): what fits on the page of the test under its title
+     */
+    public const FIRST_PART_MM = 190;
+
+    /**
+     * The height of the next parts of a full page (mm): what fits on a page of the report with its caption
+     */
+    public const PART_MM = 230;
 
     /**
      * The most parts of a full page
@@ -68,7 +90,7 @@ final class Screenshotter
      * @param string|null $type `Screenshot::END`, `Screenshot::FAILURE` or null
      * @param string|null $element CSS selector or XPath of an element to scroll to before taking the viewport
      * @param bool $fullPage Takes the whole page instead of the viewport
-     * @param bool $fitToPage Takes what fits on a page of the report (`PART_HEIGHT`), from the top of the page or of
+     * @param bool $fitToPage Takes what fits on a page of the report (`FIRST_PART_MM`), from the top of the page or of
      *   the element, instead of the viewport
      * @return array<\PieceOfCake2\Panther\Report\Screenshot>
      */
@@ -95,9 +117,9 @@ final class Screenshotter
             $images[] = ['png', (string)$client->takeScreenshot()];
         } elseif ($fullPage) {
             $mode = 'Full page';
-            $images = $this->fullPage($devTools);
+            $images = $this->fullPage($devTools, (int)$viewportWidth);
         } elseif ($fitToPage) {
-            $images[] = ['jpg', $this->fitToPage($devTools, $top)];
+            $images[] = ['jpg', $this->fitToPage($devTools, $top, (int)$viewportWidth)];
         } else {
             $images[] = ['jpg', $this->capture($devTools, null)];
         }
@@ -166,9 +188,10 @@ final class Screenshotter
      * The parts of the whole page
      *
      * @param \Facebook\WebDriver\Chrome\ChromeDevToolsDriver $devTools DevTools
+     * @param int $viewportWidth Width of the viewport (CSS pixels), for the scale in the report
      * @return array<array{string, string}>
      */
-    private function fullPage(ChromeDevToolsDriver $devTools): array
+    private function fullPage(ChromeDevToolsDriver $devTools, int $viewportWidth): array
     {
         $metrics = $devTools->execute('Page.getLayoutMetrics');
         $width = (int)ceil((float)($metrics['cssLayoutViewport']['clientWidth'] ?? 0));
@@ -178,7 +201,10 @@ final class Screenshotter
         }
 
         $images = [];
-        foreach (self::parts($height, $this->breaks($devTools)) as [$top, $bottom]) {
+        $scale = self::scale($viewportWidth);
+        $first = (int)floor(self::FIRST_PART_MM / $scale);
+        $next = (int)floor(self::PART_MM / $scale);
+        foreach (self::parts($height, $this->breaks($devTools), $first, $next) as [$top, $bottom]) {
             $clip = ['x' => 0, 'y' => $top, 'width' => $width, 'height' => $bottom - $top];
             $images[] = ['jpg', $this->capture($devTools, $clip)];
         }
@@ -217,38 +243,45 @@ final class Screenshotter
     }
 
     /**
-     * The parts of a page: each fits on a page of the report (`PART_HEIGHT`), they are about the same height, and
-     * each is cut at the break nearest to that height, so that no part is a sliver and no line is cut in two
+     * Millimeters per CSS pixel of a screenshot in the report
+     *
+     * @param int $viewportWidth Width of the viewport (CSS pixels)
+     * @return float
+     */
+    public static function scale(int $viewportWidth): float
+    {
+        return $viewportWidth > 0 && $viewportWidth < self::NARROW_WIDTH ? self::MM_PER_PIXEL_NARROW : self::MM_PER_PIXEL;
+    }
+
+    /**
+     * The parts of a page that fill the pages of the report: the first one at most `$first` high (under the title of
+     * the test), the next ones at most `$next` (a page), each cut at the lowest break in its second half, so that no
+     * line is cut in two
      *
      * @param int $height Height of the page (CSS pixels)
      * @param array<int> $breaks Where the page can be cut, sorted
+     * @param int $first Most height of the first part (CSS pixels)
+     * @param int $next Most height of the next parts (CSS pixels)
      * @return array<array{int, int}> The top and the bottom of each part, at most `MAX_PARTS`
      */
-    public static function parts(int $height, array $breaks): array
+    public static function parts(int $height, array $breaks, int $first, int $next): array
     {
         $parts = [];
         $top = 0;
         for ($count = 0; $top < $height && $count < self::MAX_PARTS; $count++) {
-            $rest = $height - $top;
-            if ($rest <= self::PART_HEIGHT) {
+            $most = $count === 0 ? $first : $next;
+            if ($height - $top <= $most) {
                 $parts[] = [$top, $height];
                 break;
             }
-            // The same height for the rest of the parts, at a break between half and all of a page of the report
-            $target = $top + (int)ceil($rest / ceil($rest / self::PART_HEIGHT));
-            $min = $top + intdiv(self::PART_HEIGHT, 2);
-            $max = $top + self::PART_HEIGHT;
-            $bottom = null;
-            foreach ($breaks as $break) {
-                if ($break < $min || $break > $max) {
-                    continue;
-                }
-                if ($bottom === null || abs($break - $target) < abs($bottom - $target)) {
-                    $bottom = $break;
-                }
+            // The lowest break in the second half of the part; none: cut at its height, as a block taller than a
+            // page has to be cut anyway
+            $bottom = $top + $most;
+            $min = $top + intdiv($most, 2);
+            $candidates = array_filter($breaks, static fn(int $break): bool => $break >= $min && $break <= $top + $most);
+            if ($candidates !== []) {
+                $bottom = max($candidates);
             }
-            // No break: at the same height, as a block taller than a page has to be cut anyway
-            $bottom ??= $target;
             $parts[] = [$top, $bottom];
             $top = $bottom;
         }
@@ -257,13 +290,14 @@ final class Screenshotter
     }
 
     /**
-     * What fits on a page of the report: `PART_HEIGHT` CSS pixels of the page from a position, or less at its end
+     * What fits on a page of the report under the title of the test (`FIRST_PART_MM`), from a position of the page
      *
      * @param \Facebook\WebDriver\Chrome\ChromeDevToolsDriver $devTools DevTools
      * @param float $top Top of the area in the page (CSS pixels)
+     * @param int $viewportWidth Width of the viewport (CSS pixels), for the scale in the report
      * @return string
      */
-    private function fitToPage(ChromeDevToolsDriver $devTools, float $top): string
+    private function fitToPage(ChromeDevToolsDriver $devTools, float $top, int $viewportWidth): string
     {
         $metrics = $devTools->execute('Page.getLayoutMetrics');
         $width = (int)ceil((float)($metrics['cssLayoutViewport']['clientWidth'] ?? 0));
@@ -273,7 +307,9 @@ final class Screenshotter
             return $this->capture($devTools, null);
         }
 
-        return $this->capture($devTools, ['x' => 0, 'y' => $top, 'width' => $width, 'height' => min(self::PART_HEIGHT, $height - $top)]);
+        $most = (int)floor(self::FIRST_PART_MM / self::scale($viewportWidth));
+
+        return $this->capture($devTools, ['x' => 0, 'y' => $top, 'width' => $width, 'height' => min($most, $height - $top)]);
     }
 
     /**

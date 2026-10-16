@@ -100,8 +100,8 @@ public function testApply(): void
 | --- | --- | --- |
 | `takeReportScreenshot('名前')` | `Viewport` | ブラウザに見えている範囲 (スクロールしている位置のまま) |
 | `takeReportScreenshot('名前', element: '.jobs')` | `Element: .jobs` | 要素をいちばん上までスクロールした後の見えている範囲。画面の下にある部分を撮るとき |
-| `takeReportScreenshot('名前', fitToPage: true)` | `Fit to page` | ページの上から (`element` を指定したときはその要素の上から)、報告書の 1 ページに収まる分 (1500 CSS ピクセル) |
-| `takeReportScreenshot('名前', fullPage: true)` | `Full page` | ページ全体。報告書の 1 ページに収まるよう、1500 CSS ピクセル以下の同じ高さに分ける (最大 20) |
+| `takeReportScreenshot('名前', fitToPage: true)` | `Fit to page` | ページの上から (`element` を指定したときはその要素の上から)、テストのページの見出しの下に収まる分 (190mm) |
+| `takeReportScreenshot('名前', fullPage: true)` | `Full page` | ページ全体。報告書のページを埋めるように分ける (見出しの下に収まる分、その後は 1 ページずつ。ページの行・区画の境目で切る)。分けた画像は 1 枚の画像として続けて載せる (最大 20) |
 
 `element` は CSS セレクター、または `/`・`./`・`(` で始まる XPath です。`PANTHER_REPORT_PDF` が無いときは
 `takeReportScreenshot()` は何もしないので、テストの速さは変わりません。

@@ -68,12 +68,15 @@ td .mono.sub { font-size: 7.5pt; }
 /* The steps one under the other, separated by a line; the images of a step with some space between them */
 .shots { margin-top: 4mm; }
 .step + .step { border-top: 0.75pt solid var(--line); margin-top: 6mm; padding-top: 6mm; }
-.step figure + figure { margin-top: 7mm; }
 /* The image in the center, its caption on the left across the page */
-figure { margin: 0; break-inside: avoid; width: 100%; }
-/* The width of an image is set by its scale (HtmlRenderer::MM_PER_PIXEL); a figure goes to the next page when it does not fit */
-figure img { display: block; margin: 0 auto; max-width: 100%; height: auto; border: 1px solid var(--line); }
-figcaption { font-size: 8pt; line-height: 1.5; margin-top: 1.5mm; }
+figure { margin: 0; width: 100%; }
+/* The width of an image is set by its scale (Screenshotter::MM_PER_PIXEL); an image goes to the next page when it
+   does not fit. The parts of a full page follow each other as one image, cut only between the pages */
+figure img { display: block; margin: 0 auto; max-width: 100%; height: auto; border: 1px solid var(--line); break-inside: avoid; }
+figure img + img { margin-top: 7mm; }
+figure img + img.continued { margin-top: 0; border-top: 0; }
+figure img:has(+ img.continued) { border-bottom: 0; }
+figcaption { font-size: 8pt; line-height: 1.5; margin-top: 1.5mm; break-before: avoid; }
 figcaption .name { display: block; font-weight: 700; }
 figcaption .kind { display: inline-block; color: #fff; background: #6b6b6b; border-radius: 2px; padding: 0 5px; margin-right: 2mm; font-size: 7pt; }
 figcaption .path { font-family: "SF Mono", Menlo, "DejaVu Sans Mono", monospace; font-size: 7.5pt; background: var(--soft); border: 0.5pt solid var(--line); border-radius: 2px; padding: 0 4px; margin-right: 2mm; overflow-wrap: anywhere; }

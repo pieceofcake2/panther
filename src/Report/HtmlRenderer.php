@@ -20,23 +20,6 @@ final class HtmlRenderer
     public const TEMPLATE_DIR = __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'resources' . DIRECTORY_SEPARATOR . 'report';
 
     /**
-     * Millimeters per CSS pixel of the screenshots in the report, the same for every mode: a viewport of 1200 x 957
-     * is 120 x 96 mm (two fit on a page), and a part of a full page (1500 pixels at most) 150 mm high
-     */
-    public const MM_PER_PIXEL = 0.1;
-
-    /**
-     * Millimeters per CSS pixel of the screenshots of a narrow viewport (a phone), whose text would be too small:
-     * a viewport of 390 x 844 is 55 x 118 mm, and a part of a full page still fits on a page
-     */
-    public const MM_PER_PIXEL_NARROW = 0.14;
-
-    /**
-     * A viewport narrower than this is a phone (CSS pixels), as the usual breakpoint of a tablet
-     */
-    public const NARROW_WIDTH = 768;
-
-    /**
      * Constructor
      *
      * @param \PieceOfCake2\Panther\Report\Translator $translator Messages
@@ -242,10 +225,10 @@ final class HtmlRenderer
     }
 
     /**
-     * The screenshots of a test by step
+     * The screenshots of a test by step: the parts of a full page follow each other, with one caption
      *
      * @param \PieceOfCake2\Panther\Report\TestResult $result Result
-     * @return array<array{label: string, images: array<array<string, mixed>>}>
+     * @return array<array{label: string, mode: string, path: string, title: string, images: array<array<string, mixed>>}>
      */
     private function steps(TestResult $result): array
     {
@@ -261,27 +244,22 @@ final class HtmlRenderer
             if (count($steps) > 1) {
                 $label = $this->t('screenshot.step', ['number' => $number, 'name' => $label]);
             }
+            $mode = $first->mode;
+            if ($mode === 'Viewport') {
+                $mode .= ' ' . $first->viewportWidth . '×' . $first->viewportHeight;
+            }
             $images = [];
             foreach ($screenshots as $screenshot) {
-                $mode = $screenshot->mode;
-                if ($mode === 'Viewport') {
-                    $mode .= ' ' . $screenshot->viewportWidth . '×' . $screenshot->viewportHeight;
-                }
-                if ($screenshot->parts > 1) {
-                    $mode .= ' ' . $screenshot->part . '/' . $screenshot->parts;
-                }
                 // The same scale for every screenshot: the width of the image in CSS pixels (without a scroll bar)
-                $scale = $screenshot->viewportWidth < self::NARROW_WIDTH ? self::MM_PER_PIXEL_NARROW : self::MM_PER_PIXEL;
                 $width = $screenshot->viewportWidth > 0 ? min($screenshot->width, $screenshot->viewportWidth) : $screenshot->width;
                 $images[] = [
                     'file' => $screenshot->file,
-                    'mode' => $mode,
-                    'path' => $screenshot->path,
-                    'title' => $screenshot->title,
-                    'style' => sprintf('width: %.1fmm', $width * $scale),
+                    'style' => sprintf('width: %.1fmm', $width * Screenshotter::scale($screenshot->viewportWidth)),
+                    // A part of a full page after the first one follows it without a gap
+                    'continued' => $screenshot->part > 1,
                 ];
             }
-            $view[] = ['label' => $label, 'images' => $images];
+            $view[] = ['label' => $label, 'mode' => $mode, 'path' => $first->path, 'title' => $first->title, 'images' => $images];
         }
 
         return $view;

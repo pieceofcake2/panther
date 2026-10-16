@@ -107,12 +107,14 @@ class HtmlRendererTest extends TestCase
         // The steps and their captions
         $this->assertStringContainsString('<span class="name">1. Search form</span>', $html);
         $this->assertStringContainsString('<span class="kind">Viewport 1366×768</span><span class="path">/career/</span><span class="page-title">Careers &lt;Hilton&gt;</span>', $html);
-        $this->assertStringContainsString('<span class="kind">Full page 2/2</span>', $html);
+        // The parts of a full page follow each other with one caption
+        $this->assertSame(1, substr_count($html, '<span class="kind">Full page</span>'));
+        $this->assertSame(1, substr_count($html, '<img class="continued"'));
         // The same scale for every mode: 0.1 mm per CSS pixel, 0.14 mm for a phone
         $this->assertSame(3, substr_count($html, 'style="width: 136.6mm"'));
         $this->assertStringContainsString('<span class="name">At the failure</span>', $html);
         // The images of a step are together, and the list repeats its header on each page
-        $this->assertSame(3, substr_count($html, '<div class="step">'));
+        $this->assertSame(3, substr_count($html, '<figure class="step">'));
         $this->assertStringContainsString('<thead><tr><th>No.</th>', $html);
         $this->assertStringContainsString('style="width: 54.6mm"', $html);
 

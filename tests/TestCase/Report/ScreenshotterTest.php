@@ -9,17 +9,19 @@ use PieceOfCake2\Panther\Report\Screenshotter;
 class ScreenshotterTest extends TestCase
 {
     /**
+     * Parts of at most 1900 pixels for the first one (under the title of the test) and 2300 for the next ones
+     *
      * @return array<string, array{int, array<int>, array<array{int, int}>}>
      */
     public static function partsProvider(): array
     {
         return [
-            'fits on a page' => [1200, [0, 600, 1200], [[0, 1200]]],
-            'cut at the break nearest to the half' => [1700, [0, 500, 900, 1300, 1700], [[0, 900], [900, 1700]]],
-            'rows of 400 pixels' => [4000, range(0, 4000, 400), [[0, 1200], [1200, 2400], [2400, 3200], [3200, 4000]]],
-            'no break: parts of the same height' => [5000, [0, 3000, 5000], [[0, 1250], [1250, 2500], [2500, 3750], [3750, 5000]]],
-            // A break below half a page would make a part too short
-            'too high a break is not used' => [2000, [0, 300, 2000], [[0, 1000], [1000, 2000]]],
+            'fits under the title' => [1900, [0, 600, 1900], [[0, 1900]]],
+            'cut at the lowest break' => [2500, [0, 500, 900, 1300, 1700, 2100, 2500], [[0, 1700], [1700, 2500]]],
+            'rows of 400 pixels' => [6000, range(0, 6000, 400), [[0, 1600], [1600, 3600], [3600, 5600], [5600, 6000]]],
+            'no break: at the most height' => [5000, [0, 5000], [[0, 1900], [1900, 4200], [4200, 5000]]],
+            // A break in the first half would make a part too short
+            'too high a break is not used' => [2500, [0, 300, 2500], [[0, 1900], [1900, 2500]]],
         ];
     }
 
@@ -30,17 +32,22 @@ class ScreenshotterTest extends TestCase
      */
     public function testParts(int $height, array $breaks, array $parts): void
     {
-        $this->assertSame($parts, Screenshotter::parts($height, $breaks));
+        $this->assertSame($parts, Screenshotter::parts($height, $breaks, 1900, 2300));
     }
 
     public function testPartsOfAVeryLongPage(): void
     {
-        $parts = Screenshotter::parts(100000, []);
+        $parts = Screenshotter::parts(100000, [], 1900, 2300);
 
         $this->assertCount(Screenshotter::MAX_PARTS, $parts);
-        $this->assertSame(0, $parts[0][0]);
-        foreach ($parts as [$top, $bottom]) {
-            $this->assertLessThanOrEqual(Screenshotter::PART_HEIGHT, $bottom - $top);
-        }
+        $this->assertSame([0, 1900], $parts[0]);
+        $this->assertSame([1900, 4200], $parts[1]);
+    }
+
+    public function testScale(): void
+    {
+        $this->assertSame(0.1, Screenshotter::scale(1200));
+        $this->assertSame(0.14, Screenshotter::scale(390));
+        $this->assertSame(0.1, Screenshotter::scale(0));
     }
 }

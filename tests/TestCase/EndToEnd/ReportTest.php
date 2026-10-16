@@ -121,22 +121,21 @@ class ReportTest extends PantherTestCase
         $this->assertSame([
             [1, 'Top page', 'Viewport', 1, 1],
             [2, 'Red block', 'Element: #target', 1, 1],
-            [3, 'Whole page', 'Full page', 1, 4],
-            [3, 'Whole page', 'Full page', 2, 4],
-            [3, 'Whole page', 'Full page', 3, 4],
-            [3, 'Whole page', 'Full page', 4, 4],
+            [3, 'Whole page', 'Full page', 1, 3],
+            [3, 'Whole page', 'Full page', 2, 3],
+            [3, 'Whole page', 'Full page', 3, 3],
             [4, 'A page of the report', 'Fit to page', 1, 1],
             [5, 'A page from the red block', 'Fit to page: #target', 1, 1],
         ], $steps);
 
-        // The parts of a full page of 5000 pixels: 4 parts of 1250 pixels, as wide as the page
-        // (the viewport without its scroll bar, which takes 15 pixels on Linux)
-        $sizes = array_map(static fn(Screenshot $screenshot): array => self::imageSize($recorder, $screenshot), array_slice($result->screenshots, 2, 4));
+        // The parts of a full page of 5000 pixels that fill the pages of the report (1900 pixels under the title of
+        // the test, then 2300), as wide as the page (the viewport without its scroll bar, 15 pixels on Linux)
+        $sizes = array_map(static fn(Screenshot $screenshot): array => self::imageSize($recorder, $screenshot), array_slice($result->screenshots, 2, 3));
         $width = $sizes[0][0];
-        $this->assertSame([[$width, 1250], [$width, 1250], [$width, 1250], [$width, 1250]], $sizes);
-        // What fits on a page of the report: 1500 pixels from the top of the page, or of the element
-        $this->assertSame([$width, 1500], self::imageSize($recorder, $result->screenshots[6]));
-        $this->assertSame([$width, 1500], self::imageSize($recorder, $result->screenshots[7]));
+        $this->assertSame([[$width, 1900], [$width, 2300], [$width, 800]], $sizes);
+        // What fits on a page of the report under the title: 1900 pixels from the top of the page, or of the element
+        $this->assertSame([$width, 1900], self::imageSize($recorder, $result->screenshots[5]));
+        $this->assertSame([$width, 1900], self::imageSize($recorder, $result->screenshots[6]));
         $this->assertLessThanOrEqual($result->screenshots[2]->viewportWidth, $width);
         $this->assertGreaterThan($result->screenshots[2]->viewportWidth - 30, $width);
     }
@@ -147,7 +146,8 @@ class ReportTest extends PantherTestCase
 
         $screenshots = self::result($recorder, 'testRows')->screenshots;
         $heights = array_map(static fn(Screenshot $screenshot): int => self::imageSize($recorder, $screenshot)[1], $screenshots);
-        $this->assertSame([1200, 1200, 800, 800], $heights);
+        // Cut between the rows: the lowest break under 1900 pixels, then under 2300
+        $this->assertSame([1600, 2000, 400], $heights);
     }
 
     public function testElementIsScrolledToTheTop(): void
@@ -159,7 +159,7 @@ class ReportTest extends PantherTestCase
 
         $screenshots = self::result($recorder, 'testSteps')->screenshots;
         // The viewport scrolled to the element, and a page of the report from the element
-        foreach ([$screenshots[1], $screenshots[7]] as $screenshot) {
+        foreach ([$screenshots[1], $screenshots[6]] as $screenshot) {
             $image = imagecreatefromjpeg($recorder->dir() . DS . $screenshot->file);
             $this->assertNotFalse($image);
             $rgb = imagecolorat($image, 10, 10);

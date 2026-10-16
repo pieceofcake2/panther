@@ -121,17 +121,15 @@
         <?php if ($test['steps'] !== []) : ?>
             <div class="shots">
             <?php foreach ($test['steps'] as $step) : ?>
-                <div class="step">
+                <figure class="step">
                 <?php foreach ($step['images'] as $image) : ?>
-                    <figure>
-                    <img src="<?= $h(rawurlencode($image['file'])) ?>" alt="" style="<?= $h($image['style']) ?>">
-                    <figcaption>
-                    <span class="name"><?= $h($step['label']) ?></span>
-                    <span class="kind"><?= $h($image['mode']) ?></span><span class="path"><?= $h($image['path']) ?></span><span class="page-title"><?= $h($image['title']) ?></span>
-                    </figcaption>
-                    </figure>
+                    <img class="<?= $image['continued'] ? 'continued' : '' ?>" src="<?= $h(rawurlencode($image['file'])) ?>" alt="" style="<?= $h($image['style']) ?>">
                 <?php endforeach; ?>
-                </div>
+                <figcaption>
+                <span class="name"><?= $h($step['label']) ?></span>
+                <span class="kind"><?= $h($step['mode']) ?></span><span class="path"><?= $h($step['path']) ?></span><span class="page-title"><?= $h($step['title']) ?></span>
+                </figcaption>
+                </figure>
             <?php endforeach; ?>
             </div>
         <?php endif; ?>
