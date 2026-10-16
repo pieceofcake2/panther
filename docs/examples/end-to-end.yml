@@ -49,6 +49,7 @@ jobs:
 
       - name: Run End-to-End tests
         env:
+          DATABASE_URL: mysql://root:root@127.0.0.1:3306/test_app
           DATABASE_TEST_URL: mysql://root:root@127.0.0.1:3306/test_app
           PANTHER_NO_SANDBOX: 1
         run: vendor/bin/phpunit --testsuite EndToEnd --log-junit end-to-end-junit.xml

@@ -7,14 +7,14 @@ End-to-End テストは Symfony Panther と同じように、`PANTHER_*` 環境�
 
 ## phpunit.xml.dist
 
-拡張を登録し、Web サーバーのデータソースを設定して、`EndToEnd` スイートを追加します
+拡張を登録し、テスト環境を設定して、`EndToEnd` スイートを追加します
 ([docs/examples/phpunit.xml.dist](../examples/phpunit.xml.dist))。
 
 ```xml
 <phpunit bootstrap="./tests/bootstrap.php" defaultTestSuite="App">
     <php>
-        <!-- The web server uses the test datasource, where the fixtures are -->
-        <server name="PANTHER_APP_ENV" value="test"/>
+        <!-- The tests and the web server load .env.test, where the database is the test database -->
+        <env name="APP_ENV" value="test" force="true"/>
         <!-- Screenshots of the failed End-to-End tests -->
         <server name="PANTHER_ERROR_SCREENSHOT_DIR" value="./tmp/error-screenshots"/>
     </php>
@@ -35,6 +35,10 @@ End-to-End テストは Symfony Panther と同じように、`PANTHER_*` 環境�
     </testsuites>
 </phpunit>
 ```
+
+`APP_ENV` は、Symfony の `phpunit.xml.dist` と同じく `<env>` 要素です。PHPUnit はこれを `putenv()` と `$_ENV` に
+設定するので、テストは pieceofcake2/app の `config/.env.test` を読み込み、Web サーバーもそれを引き継いで同じ
+ファイルを読み込みます ([テスト用データベース](test-database.md#the-test-environment))。
 
 このパッケージは Panther と同じように `$_SERVER` から設定を読み込むので、Symfony のドキュメントと同じく
 設定は `<server>` 要素で指定します。シェルの変数も `$_SERVER` に入りますが、`<server>` 要素はそれを
@@ -71,7 +75,7 @@ PANTHER_WEB_SERVER_PORT=9180 vendor/bin/phpunit --testsuite EndToEnd
 | `PANTHER_WEB_SERVER_ROUTER` | ルータースクリプト。ドキュメントルートからの相対パスです。デフォルトは [CakePHP のルータースクリプト](#the-cakephp-router-script)。空にすると使いません |
 | `PANTHER_READINESS_PATH` | Web サーバーが起動したことを確認するためにリクエストするパス。デフォルトは `/` |
 | `PANTHER_EXTERNAL_BASE_URI` | この URL ですでに動いているアプリケーションをテストします。Web サーバーは起動しません |
-| `PANTHER_APP_ENV` | Web サーバーに `APP_ENV` として渡されます。`config/database.php` がテスト用データソースを使うように `test` を設定します |
+| `PANTHER_APP_ENV` | Web サーバーに `APP_ENV` として渡されます。Web サーバーにテストとは異なる `APP_ENV` を渡すときだけ必要です。設定しなければ、Web サーバーはテストの `APP_ENV` を引き継ぎます |
 | `PANTHER_ERROR_SCREENSHOT_DIR` | 失敗したテストのスクリーンショットを保存するディレクトリ。例: `./tmp/error-screenshots` |
 | `PANTHER_ERROR_SCREENSHOT_ATTACH` | スクリーンショットを JUnit の添付ファイル形式で出力します |
 | `PANTHER_NO_HEADLESS` | ブラウザーのウィンドウを表示します |

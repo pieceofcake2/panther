@@ -26,7 +26,7 @@ CakePHP 2 アプリケーションで行います。
 | `WebTestAssertionsTrait` のアサーション | `PieceOfCake2\Panther\TestSuite\WebTestAssertionsTrait`。Symfony の FrameworkBundle なしで使える同じアサーション |
 | `PANTHER_WEB_SERVER_DIR` のデフォルトは `public/` | デフォルトは `webroot/` (または `app/webroot/`) |
 | `PANTHER_WEB_SERVER_ROUTER` のデフォルトはなし | デフォルトは [CakePHP のルータースクリプト](configuration.md#the-cakephp-router-script) |
-| `PANTHER_APP_ENV=test` で Web サーバーが `.env.test` を読み込む | `PANTHER_APP_ENV=test` で `config/database.php` が `test` データソースを使う |
+| `phpunit.xml.dist` の `APP_ENV=test` で、テストと Web サーバーが `.env.test` を読み込む | 同じ。pieceofcake2/app の `config/.env.test` を読み込む |
 
 それ以外はすべて Panther そのものです。`Client` (`request()`、`clickLink()`、`submitForm()`、`waitFor()`、
 `takeScreenshot()` など)、`createPantherClient()` とそのオプション、そして `PANTHER_*` 環境変数です。
@@ -63,12 +63,12 @@ vendor/bin/bdi detect drivers
 
 ## クイックスタート
 
-1. `phpunit.xml.dist` で拡張を登録し、Web サーバーのデータソースを設定します
+1. `phpunit.xml.dist` で拡張を登録し、テスト環境を設定します
    ([設定](configuration.md#phpunitxmldist))。
 
    ```xml
    <php>
-       <server name="PANTHER_APP_ENV" value="test"/>
+       <env name="APP_ENV" value="test" force="true"/>
        <server name="PANTHER_ERROR_SCREENSHOT_DIR" value="./tmp/error-screenshots"/>
    </php>
    <extensions>
@@ -76,8 +76,8 @@ vendor/bin/bdi detect drivers
    </extensions>
    ```
 
-2. Web サーバーの中では `config/database.php` がそのデータソースを `default` として使うようにします
-   ([テスト用データベース](test-database.md#the-databasephp-switch))。
+2. `config/.env.test` で `DATABASE_URL` と `DATABASE_TEST_URL` をテスト用データベースに設定します。テストと
+   Web サーバーは `APP_ENV=test` でこのファイルを読み込みます ([テスト用データベース](test-database.md#the-test-environment))。
 3. `tests/TestCase/EndToEnd/` に、`PieceOfCake2\Panther\TestSuite\PantherTestCase` を継承するテストを
    書きます ([テストを書く](writing-tests.md))。
 4. テストを実行します。
