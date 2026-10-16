@@ -73,7 +73,7 @@ PANTHER_WEB_SERVER_PORT=9180 vendor/bin/phpunit --testsuite EndToEnd
 | `PANTHER_ERROR_SCREENSHOT_DIR` | 失敗したテストのスクリーンショットを保存するディレクトリ。例: `./tmp/error-screenshots` |
 | `PANTHER_ERROR_SCREENSHOT_ATTACH` | スクリーンショットを JUnit の添付ファイル形式で出力します |
 | `PANTHER_NO_HEADLESS` | ブラウザーのウィンドウを表示します |
-| `PANTHER_DEVTOOLS` | ブラウザーの DevTools を開きます |
+| `PANTHER_DEVTOOLS` | ブラウザーの DevTools を開きます。Panther 2.3 以降と同じく、既定では閉じています。PHP 8.0 で入る古い Panther でも同じです。古い Panther は DevTools をウィンドウ内に開くため、ページの幅が狭くなり、レポートのスクリーンショットがスマートフォンの縮尺になっていました |
 | `PANTHER_NO_REDUCED_MOTION` | アニメーションの軽減 (reduced motion) を要求しません (Panther 2.2 以降) |
 | `PANTHER_NO_SANDBOX` | Chrome のサンドボックスを無効にします (コンテナ、CI) |
 | `PANTHER_CHROME_ARGUMENTS` | Chrome の追加の引数。スペースで区切ります。例: `--lang=ja --window-size=1600,1200` |

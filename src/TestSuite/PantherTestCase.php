@@ -14,6 +14,7 @@ use PieceOfCake2\Panther\Report\Screenshot;
 use PieceOfCake2\Panther\Report\TestResult;
 use ReflectionClass;
 use ReflectionProperty;
+use Symfony\Component\Panther\Client as PantherClient;
 use Symfony\Component\Panther\PantherTestCaseTrait;
 use Symfony\Component\Panther\ServerExtensionLegacy;
 use Throwable;
@@ -46,6 +47,7 @@ use Throwable;
  * - The web server router defaults to the CakePHP router script of this package (`resources/router.php`)
  * - The web server gets the working directory of the tests (`PANTHER_WORKING_DIR`), where the router script
  *   runs the application, so that relative paths point to the same files in the tests and in the web server
+ * - The DevTools of Chrome are closed unless `PANTHER_DEVTOOLS` is set, as with Panther 2.3+, also with an older Panther
  * - The assertions of Panther's `WebTestAssertionsTrait`, without the Symfony FrameworkBundle
  *
  * Every other setting is Panther's: `PANTHER_WEB_SERVER_DIR`, `PANTHER_WEB_SERVER_PORT`,
@@ -56,6 +58,7 @@ abstract class PantherTestCase extends CakeTestCase
 {
     use PantherTestCaseTrait {
         startWebServer as private startPantherWebServer;
+        createPantherClient as private createPantherClientOfPanther;
     }
     use WebTestAssertionsTrait;
 
@@ -249,6 +252,37 @@ abstract class PantherTestCase extends CakeTestCase
         }
 
         self::startPantherWebServer($options);
+    }
+
+    /**
+     * Creates the Panther client as Panther does, with the DevTools of Chrome closed unless `PANTHER_DEVTOOLS` is set
+     * (`closeDevToolsByDefault()`).
+     *
+     * @param array<string, mixed> $options See `PantherTestCaseTrait::$defaultOptions`
+     * @param array<string, mixed> $kernelOptions Kernel options
+     * @param array<string, mixed> $managerOptions Options of the browser manager
+     * @return \Symfony\Component\Panther\Client
+     */
+    protected static function createPantherClient(array $options = [], array $kernelOptions = [], array $managerOptions = []): PantherClient
+    {
+        static::closeDevToolsByDefault();
+
+        return self::createPantherClientOfPanther($options, $kernelOptions, $managerOptions);
+    }
+
+    /**
+     * Closes the DevTools of Chrome when `PANTHER_DEVTOOLS` is not set, as Panther 2.3+ does. Panther before 2.3
+     * (installed on PHP 8.0) opens them by default, docked in the window, which narrows the page: a page of 1200
+     * pixels is 645 wide, and the screenshots of the report use the scale of a phone.
+     *
+     * @return void
+     */
+    public static function closeDevToolsByDefault(): void
+    {
+        if (!isset($_SERVER['PANTHER_DEVTOOLS'])) {
+            $value = getenv('PANTHER_DEVTOOLS');
+            $_SERVER['PANTHER_DEVTOOLS'] = $value === false ? '0' : $value;
+        }
     }
 
     /**
