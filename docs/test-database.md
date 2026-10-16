@@ -4,13 +4,16 @@
 
 The web server is a separate PHP process. To read the fixtures, its `default` connection must be the
 database the fixtures are loaded into, the one of the `test` datasource. As in Symfony, this comes from the
-`test` environment. The `tests/bootstrap.php` of pieceofcake2/app sets `APP_ENV` before CakePHP loads the
-`.env` files:
+`test` environment. The tests of pieceofcake2/app (`vendor/bin/phpunit` and `bin/cake test`) run with
+`APP_ENV=test` by default: when `APP_ENV` is not set, its `tests/bootstrap.php` sets it before CakePHP loads
+the `.env` files:
 
 ```php
-putenv('APP_ENV=test');
-$_ENV['APP_ENV'] = 'test';
-$_SERVER['APP_ENV'] = 'test';
+if ((string)getenv('APP_ENV') === '' && empty($_SERVER['APP_ENV'])) {
+    putenv('APP_ENV=test');
+    $_ENV['APP_ENV'] = 'test';
+    $_SERVER['APP_ENV'] = 'test';
+}
 ```
 
 The tests run with `APP_ENV=test`, and the web server that Panther starts inherits the environment of the
@@ -23,31 +26,28 @@ database. As in Symfony, there is one variable: `DATABASE_URL` is the database o
 DATABASE_URL="mysql://user:password@localhost:3306/test_database_name?encoding=utf8mb4"
 ```
 
-With `APP_ENV=test`, `config/database.php` gives `DATABASE_URL` to both connections, so the `default`
-connection of the web server is the database of the fixtures. The `test` connection reads it only when
-`config/core.php` loaded the files with `APP_ENV=test`; otherwise `DATABASE_URL` is your development
-database, which the fixtures must never touch:
+`config/database.php` gives `DATABASE_URL` to both connections, so the `default` connection of the web
+server is the database of the fixtures:
 
 ```php
 public function __construct()
 {
     $this->default['dsn'] = env('DATABASE_URL');
-    if (Configure::read('App.env') === 'test') {
-        $this->test['dsn'] = env('DATABASE_URL');
-    }
+    $this->test['dsn'] = env('DATABASE_URL');
 }
 ```
 
 Set your own test database in `config/.env.test.local` (ignored by Git) or as a real environment variable,
-which wins over `config/.env.test` (CI sets `DATABASE_URL` this way). The test database must be a database both processes can open: a database
+which wins over `config/.env.test` (CI sets `DATABASE_URL` this way). Do not export your development
+`APP_ENV` or `DATABASE_URL` in the shell where you run the tests: they win over the files too. The test database must be a database both processes can open: a database
 server, or an SQLite file, not `:memory:`. The `'dsn'` key needs pieceofcake2/cakephp 2.12.7 or later.
 
 `PANTHER_APP_ENV` is only needed to give the web server a different `APP_ENV` than the tests; Panther passes
 it to the web server as `APP_ENV`.
 
 For an application created from an earlier skeleton, copy the `.env` loading at the top of pieceofcake2/app's
-`config/core.php` (with the `App.env` line), `tests/bootstrap.php`, `config/.env.test` and the constructor
-above.
+`config/core.php`, the `APP_ENV` default of `tests/bootstrap.php` and `bin/cake`, `config/.env.test` and the
+constructor above.
 
 ## Fixtures Shared With the Web Server
 

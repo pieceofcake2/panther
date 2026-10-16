@@ -32,8 +32,8 @@ Register the extension and add an `EndToEnd` suite
 </phpunit>
 ```
 
-`APP_ENV=test` is set by `tests/bootstrap.php` of pieceofcake2/app before CakePHP loads the `.env` files, so
-the tests load `config/.env.test`, and the web server inherits it and loads the same file
+The tests of pieceofcake2/app run with `APP_ENV=test` by default (`tests/bootstrap.php` sets it before
+CakePHP loads the `.env` files when it is not set), so the tests load `config/.env.test`, and the web server inherits it and loads the same file
 ([Test Database](test-database.md#the-test-environment)).
 
 Like Panther, the package reads its settings from `$_SERVER`, so they are `<server>` elements, as in the

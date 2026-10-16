@@ -26,7 +26,7 @@ CakePHP 2 アプリケーションで行います。
 | `WebTestAssertionsTrait` のアサーション | `PieceOfCake2\Panther\TestSuite\WebTestAssertionsTrait`。Symfony の FrameworkBundle なしで使える同じアサーション |
 | `PANTHER_WEB_SERVER_DIR` のデフォルトは `public/` | デフォルトは `webroot/` (または `app/webroot/`) |
 | `PANTHER_WEB_SERVER_ROUTER` のデフォルトはなし | デフォルトは [CakePHP のルータースクリプト](configuration.md#the-cakephp-router-script) |
-| `phpunit.xml.dist` の `APP_ENV=test` で、テストと Web サーバーが `.env.test` を読み込む | 同じ。pieceofcake2/app の `config/.env.test` を読み込む。`APP_ENV=test` は `tests/bootstrap.php` が設定する |
+| `phpunit.xml.dist` の `APP_ENV=test` で、テストと Web サーバーが `.env.test` を読み込む | 同じ。pieceofcake2/app の `config/.env.test` を読み込む。テストはデフォルトで `APP_ENV=test` で動く |
 
 それ以外はすべて Panther そのものです。`Client` (`request()`、`clickLink()`、`submitForm()`、`waitFor()`、
 `takeScreenshot()` など)、`createPantherClient()` とそのオプション、そして `PANTHER_*` 環境変数です。
@@ -75,7 +75,7 @@ vendor/bin/bdi detect drivers
    ```
 
 2. `config/.env.test` で `DATABASE_URL` をテスト用データベースに設定します。テストと Web サーバーは、
-   `tests/bootstrap.php` が設定する `APP_ENV=test` でこのファイルを読み込みます
+   テストのデフォルトの `APP_ENV=test` でこのファイルを読み込みます
    ([テスト用データベース](test-database.md#the-test-environment))。
 3. `tests/TestCase/EndToEnd/` に、`PieceOfCake2\Panther\TestSuite\PantherTestCase` を継承するテストを
    書きます ([テストを書く](writing-tests.md))。

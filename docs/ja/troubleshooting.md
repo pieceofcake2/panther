@@ -11,7 +11,7 @@
 の場合は、`$managerOptions` で別の `port` を渡してください。
 
 **ブラウザーに `Missing Database Table` と表示される** — Web サーバーがテスト用データソースを
-使っていません。`tests/bootstrap.php` が `APP_ENV=test` を設定していること、`config/.env.test`
+使っていません。テストが `APP_ENV=test` で動いていること (環境変数にほかの `APP_ENV` が無いこと)、`config/.env.test`
 (または実際の環境変数) の `DATABASE_URL` がテスト用データベースであること、テスト用データベースがインメモリの
 SQLite データベースでないことを確認してください。
 

@@ -34,8 +34,8 @@ End-to-End テストは Symfony Panther と同じように、`PANTHER_*` 環境�
 </phpunit>
 ```
 
-`APP_ENV=test` は、CakePHP が `.env` ファイルを読み込む前に pieceofcake2/app の `tests/bootstrap.php` が
-設定します。そのため、テストは `config/.env.test` を読み込み、Web サーバーもそれを引き継いで同じファイルを
+pieceofcake2/app のテストは、デフォルトで `APP_ENV=test` で動きます (`APP_ENV` が設定されていなければ、
+CakePHP が `.env` ファイルを読み込む前に `tests/bootstrap.php` が設定します)。そのため、テストは `config/.env.test` を読み込み、Web サーバーもそれを引き継いで同じファイルを
 読み込みます ([テスト用データベース](test-database.md#the-test-environment))。
 
 このパッケージは Panther と同じように `$_SERVER` から設定を読み込むので、Symfony のドキュメントと同じく

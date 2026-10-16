@@ -84,8 +84,8 @@ It is a library (PSR-4, `PieceOfCake2\Panther\`), not a CakePHP plugin: there is
    </extensions>
    ```
 
-2. Set `DATABASE_URL` to the test database in `config/.env.test`. The tests run with `APP_ENV=test` (set
-   by `tests/bootstrap.php`), and the web server inherits it, so both load that file, as in Symfony
+2. Set `DATABASE_URL` to the test database in `config/.env.test`. The tests run with `APP_ENV=test` by
+   default (pieceofcake2/app's `tests/bootstrap.php`), and the web server inherits it, so both load that file, as in Symfony
    (pieceofcake2/app has this setup; see [Test Database](docs/test-database.md)):
 
    ```dotenv

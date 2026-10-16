@@ -9,7 +9,7 @@
     <php>
         <ini name="memory_limit" value="-1"/>
         <!--
-            tests/bootstrap.php sets APP_ENV=test: the tests and the web server load .env.test, where
+            tests/bootstrap.php sets APP_ENV=test by default: the tests and the web server load .env.test, where
             DATABASE_URL is the test database
         -->
         <!-- Screenshots of the failed End-to-End tests -->
