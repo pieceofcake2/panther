@@ -13,10 +13,9 @@ use Symfony\Component\Panther\Client;
  * Takes the screenshots of the report with a Panther client.
  *
  * With Chrome, the screenshots are taken with the DevTools Protocol as JPEG images of 1 pixel per CSS pixel, so
- * that a page of a mobile emulation (`deviceScaleFactor` of 3) is not 9 times as large, and a full page is taken
- * in parts that fill the pages of the report: the first one what fits under the title of the test, the next ones
- * what fits on a page, each cut between two rows of the page. With another browser, they are the PNG screenshots of
- * WebDriver, of the viewport.
+ * that a page of a mobile emulation (`deviceScaleFactor` of 3) is not 9 times as large. A full page is taken as one
+ * image with the positions of its rows and sections (`Screenshot::$breaks`), where the report cuts it between its
+ * pages. With another browser, they are the PNG screenshots of WebDriver, of the viewport.
  */
 final class Screenshotter
 {
@@ -38,19 +37,20 @@ final class Screenshotter
     public const NARROW_WIDTH = 768;
 
     /**
-     * The height of the first part of a full page (mm): what fits on the page of the test under its title
+     * The height of a screenshot that fits on a page (mm): what fits on the page of a test under its title
      */
-    public const FIRST_PART_MM = 190;
+    public const FIT_TO_PAGE_MM = 190;
 
     /**
-     * The height of the next parts of a full page (mm): what fits on a page of the report with its caption
+     * The most height of an image of a full page (CSS pixels): Chrome cannot take a taller one. A taller page is taken
+     * in several images
      */
-    public const PART_MM = 230;
+    public const MAX_HEIGHT = 16000;
 
     /**
-     * The most parts of a full page
+     * The most images of a full page
      */
-    public const MAX_PARTS = 20;
+    public const MAX_IMAGES = 5;
 
     /**
      * Constructor
@@ -90,7 +90,7 @@ final class Screenshotter
      * @param string|null $type `Screenshot::END`, `Screenshot::FAILURE` or null
      * @param string|null $element CSS selector or XPath of an element to scroll to before taking the viewport
      * @param bool $fullPage Takes the whole page instead of the viewport
-     * @param bool $fitToPage Takes what fits on a page of the report (`FIRST_PART_MM`), from the top of the page or of
+     * @param bool $fitToPage Takes what fits on a page of the report (`FIT_TO_PAGE_MM`), from the top of the page or of
      *   the element, instead of the viewport
      * @return array<\PieceOfCake2\Panther\Report\Screenshot>
      */
@@ -114,22 +114,22 @@ final class Screenshotter
         $devTools = $this->devTools($client);
         $images = [];
         if ($devTools === null) {
-            $images[] = ['png', (string)$client->takeScreenshot()];
+            $images[] = ['png', (string)$client->takeScreenshot(), []];
         } elseif ($fullPage) {
             $mode = 'Full page';
-            $images = $this->fullPage($devTools, (int)$viewportWidth);
+            $images = $this->fullPage($devTools);
         } elseif ($fitToPage) {
-            $images[] = ['jpg', $this->fitToPage($devTools, $top, (int)$viewportWidth)];
+            $images[] = ['jpg', $this->fitToPage($devTools, $top, (int)$viewportWidth), []];
         } else {
-            $images[] = ['jpg', $this->capture($devTools, null)];
+            $images[] = ['jpg', $this->capture($devTools, null), []];
         }
 
         $screenshots = [];
-        foreach ($images as $i => [$extension, $data]) {
+        foreach ($images as $i => [$extension, $data, $breaks]) {
             $file = sprintf('%s-%02d-%02d.%s', $prefix, $step, $i + 1, $extension);
             file_put_contents($dir . DIRECTORY_SEPARATOR . $file, $data);
             $size = getimagesizefromstring($data) ?: [0, 0];
-            $screenshots[] = new Screenshot(
+            $screenshot = new Screenshot(
                 $file,
                 $step,
                 $name,
@@ -144,6 +144,8 @@ final class Screenshotter
                 (int)$size[0],
                 (int)$size[1],
             );
+            $screenshot->breaks = $breaks;
+            $screenshots[] = $screenshot;
         }
 
         return $screenshots;
@@ -185,28 +187,35 @@ final class Screenshotter
     }
 
     /**
-     * The parts of the whole page
+     * The whole page as one image (several for a page taller than `MAX_HEIGHT`), with the positions of its rows and
+     * sections in each image
      *
      * @param \Facebook\WebDriver\Chrome\ChromeDevToolsDriver $devTools DevTools
-     * @param int $viewportWidth Width of the viewport (CSS pixels), for the scale in the report
-     * @return array<array{string, string}>
+     * @return array<array{string, string, array<int>}>
      */
-    private function fullPage(ChromeDevToolsDriver $devTools, int $viewportWidth): array
+    private function fullPage(ChromeDevToolsDriver $devTools): array
     {
         $metrics = $devTools->execute('Page.getLayoutMetrics');
         $width = (int)ceil((float)($metrics['cssLayoutViewport']['clientWidth'] ?? 0));
         $height = (int)ceil((float)($metrics['cssContentSize']['height'] ?? 0));
         if ($width <= 0 || $height <= 0) {
-            return [['jpg', $this->capture($devTools, null)]];
+            return [['jpg', $this->capture($devTools, null), []]];
         }
 
+        $breaks = $this->breaks($devTools);
         $images = [];
-        $scale = self::scale($viewportWidth);
-        $first = (int)floor(self::FIRST_PART_MM / $scale);
-        $next = (int)floor(self::PART_MM / $scale);
-        foreach (self::parts($height, $this->breaks($devTools), $first, $next) as [$top, $bottom]) {
+        $top = 0;
+        for ($count = 0; $top < $height && $count < self::MAX_IMAGES; $count++) {
+            // A page taller than an image is cut at its lowest break in reach
+            $bottom = min($height, $top + self::MAX_HEIGHT);
+            if ($bottom < $height) {
+                $inReach = array_filter($breaks, static fn(int $break): bool => $break > $top && $break < $bottom);
+                $bottom = $inReach !== [] ? max($inReach) : $bottom;
+            }
+            $inImage = array_filter($breaks, static fn(int $break): bool => $break > $top && $break < $bottom);
             $clip = ['x' => 0, 'y' => $top, 'width' => $width, 'height' => $bottom - $top];
-            $images[] = ['jpg', $this->capture($devTools, $clip)];
+            $images[] = ['jpg', $this->capture($devTools, $clip), array_values(array_map(static fn(int $break): int => $break - $top, $inImage))];
+            $top = $bottom;
         }
 
         return $images;
@@ -254,43 +263,7 @@ final class Screenshotter
     }
 
     /**
-     * The parts of a page that fill the pages of the report: the first one at most `$first` high (under the title of
-     * the test), the next ones at most `$next` (a page), each cut at the lowest break in its second half, so that no
-     * line is cut in two
-     *
-     * @param int $height Height of the page (CSS pixels)
-     * @param array<int> $breaks Where the page can be cut, sorted
-     * @param int $first Most height of the first part (CSS pixels)
-     * @param int $next Most height of the next parts (CSS pixels)
-     * @return array<array{int, int}> The top and the bottom of each part, at most `MAX_PARTS`
-     */
-    public static function parts(int $height, array $breaks, int $first, int $next): array
-    {
-        $parts = [];
-        $top = 0;
-        for ($count = 0; $top < $height && $count < self::MAX_PARTS; $count++) {
-            $most = $count === 0 ? $first : $next;
-            if ($height - $top <= $most) {
-                $parts[] = [$top, $height];
-                break;
-            }
-            // The lowest break in the second half of the part; none: cut at its height, as a block taller than a
-            // page has to be cut anyway
-            $bottom = $top + $most;
-            $min = $top + intdiv($most, 2);
-            $candidates = array_filter($breaks, static fn(int $break): bool => $break >= $min && $break <= $top + $most);
-            if ($candidates !== []) {
-                $bottom = max($candidates);
-            }
-            $parts[] = [$top, $bottom];
-            $top = $bottom;
-        }
-
-        return $parts;
-    }
-
-    /**
-     * What fits on a page of the report under the title of the test (`FIRST_PART_MM`), from a position of the page
+     * What fits on a page of the report under the title of the test (`FIT_TO_PAGE_MM`), from a position of the page
      *
      * @param \Facebook\WebDriver\Chrome\ChromeDevToolsDriver $devTools DevTools
      * @param float $top Top of the area in the page (CSS pixels)
@@ -307,7 +280,7 @@ final class Screenshotter
             return $this->capture($devTools, null);
         }
 
-        $most = (int)floor(self::FIRST_PART_MM / self::scale($viewportWidth));
+        $most = (int)floor(self::FIT_TO_PAGE_MM / self::scale($viewportWidth));
 
         return $this->capture($devTools, ['x' => 0, 'y' => $top, 'width' => $width, 'height' => min($most, $height - $top)]);
     }

@@ -44,9 +44,10 @@ class HtmlRendererTest extends TestCase
         $passed->time = 1.84;
         $passed->screenshots = [
             new Screenshot('0001-01-01.jpg', 1, 'Search form', null, 'Viewport', 1, 1, '/career/', 'Careers <Hilton>', 1366, 768, 1366, 768),
-            new Screenshot('0001-02-01.jpg', 2, 'Whole list', null, 'Full page', 1, 2, '/career/', 'Careers', 1366, 768, 1366, 1500),
-            new Screenshot('0001-02-02.jpg', 2, 'Whole list', null, 'Full page', 2, 2, '/career/', 'Careers', 1366, 768, 1366, 400),
+            new Screenshot('0001-02-01.jpg', 2, 'Whole list', null, 'Full page', 1, 1, '/career/', 'Careers', 1366, 768, 1366, 1900),
         ];
+        // Breaks out of the image and twice the same are ignored
+        $passed->screenshots[1]->breaks = [0, 500, 1200, 1200, 1900, 2000];
         $recorder->add($passed);
 
         $failed = new TestResult('App\ApplyTest::testErrors', 'App\ApplyTest', 'testErrors', 'Applications', 'Shows the errors', null, false, 'The required fields are checked.');
@@ -109,9 +110,13 @@ class HtmlRendererTest extends TestCase
         $this->assertStringContainsString('<span class="kind">Viewport 1366×768</span><span class="path">/career/</span><span class="page-title">Careers &lt;Hilton&gt;</span>', $html);
         // The parts of a full page follow each other with one caption
         $this->assertSame(1, substr_count($html, '<span class="kind">Full page</span>'));
-        $this->assertSame(1, substr_count($html, '<img class="continued"'));
+        // A full page is bands of its image between its breaks, which the pages of the report do not split
+        $this->assertSame(3, substr_count($html, '<div class="band"'));
+        $this->assertStringContainsString('<div class="band" style="height: 50.100mm"><img src="0001-02-01.jpg" alt="" style="width: 136.600mm; margin-top: 0.000mm"></div>', $html);
+        $this->assertStringContainsString('<div class="band" style="height: 70.100mm"><img src="0001-02-01.jpg" alt="" style="width: 136.600mm; margin-top: -50.000mm"></div>', $html);
+        $this->assertStringContainsString('<div class="band" style="height: 70.000mm"><img src="0001-02-01.jpg" alt="" style="width: 136.600mm; margin-top: -120.000mm"></div>', $html);
         // The same scale for every mode: 0.1 mm per CSS pixel, 0.14 mm for a phone
-        $this->assertSame(3, substr_count($html, 'style="width: 136.6mm"'));
+        $this->assertSame(2, substr_count($html, 'style="width: 136.6mm"'));
         $this->assertStringContainsString('<span class="name">At the failure</span>', $html);
         // The images of a step are together, and the list repeats its header on each page
         $this->assertSame(3, substr_count($html, '<figure class="step">'));

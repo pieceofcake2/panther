@@ -73,9 +73,15 @@ figure { margin: 0; width: 100%; }
 /* The width of an image is set by its scale (Screenshotter::MM_PER_PIXEL); an image goes to the next page when it
    does not fit. The parts of a full page follow each other as one image, cut only between the pages */
 figure img { display: block; margin: 0 auto; max-width: 100%; height: auto; border: 1px solid var(--line); break-inside: avoid; }
-figure img + img { margin-top: 7mm; }
-figure img + img.continued { margin-top: 0; border-top: 0; }
-figure img:has(+ img.continued) { border-bottom: 0; }
+figure > * + * { margin-top: 7mm; }
+/* A full page: bands of the image (between its rows and sections) that are not split, so that the image fills its
+   pages and goes to the next page between two rows (HtmlRenderer::bands()) */
+.bands { margin: 0 auto; border: 1px solid var(--line); }
+.band { overflow: hidden; break-inside: avoid; }
+.band img { display: block; max-width: none; border: 0; }
+.band + .band { margin-top: -0.1mm; }
+figure > .continued { margin-top: 0; border-top: 0; }
+figure > :has(+ .continued) { border-bottom: 0; }
 figcaption { font-size: 8pt; line-height: 1.5; margin-top: 1.5mm; break-before: avoid; }
 figcaption .name { display: block; font-weight: 700; }
 figcaption .kind { display: inline-block; color: #fff; background: #6b6b6b; border-radius: 2px; padding: 0 5px; margin-right: 2mm; font-size: 7pt; }

@@ -123,7 +123,15 @@
             <?php foreach ($test['steps'] as $step) : ?>
                 <figure class="step">
                 <?php foreach ($step['images'] as $image) : ?>
-                    <img class="<?= $image['continued'] ? 'continued' : '' ?>" src="<?= $h(rawurlencode($image['file'])) ?>" alt="" style="<?= $h($image['style']) ?>">
+                    <?php if ($image['bands'] !== []) : ?>
+                        <div class="bands <?= $image['continued'] ? 'continued' : '' ?>" style="<?= $h($image['style']) ?>">
+                        <?php foreach ($image['bands'] as $band) : ?>
+                            <div class="band" style="<?= $h($band['style']) ?>"><img src="<?= $h(rawurlencode($image['file'])) ?>" alt="" style="<?= $h($band['imageStyle']) ?>"></div>
+                        <?php endforeach; ?>
+                        </div>
+                    <?php else : ?>
+                        <img class="<?= $image['continued'] ? 'continued' : '' ?>" src="<?= $h(rawurlencode($image['file'])) ?>" alt="" style="<?= $h($image['style']) ?>">
+                    <?php endif; ?>
                 <?php endforeach; ?>
                 <figcaption>
                 <span class="name"><?= $h($step['label']) ?></span>

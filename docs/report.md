@@ -95,7 +95,7 @@ public function testApply(): void
 | `takeReportScreenshot('Name')` | `Viewport` | What the browser shows, where it is scrolled to |
 | `takeReportScreenshot('Name', element: '.jobs')` | `Element: .jobs` | The viewport after the element is scrolled to the top, for a part of the page below the fold |
 | `takeReportScreenshot('Name', fitToPage: true)` | `Fit to page` | What fits on the page of the test under its title (190 mm) from the top of the page, or from the top of `element` |
-| `takeReportScreenshot('Name', fullPage: true)` | `Full page` | The whole page, in parts that fill the pages of the report: what fits under the title of the test, then a page each, cut between two rows or sections of the page. The parts follow each other as one image (20 parts at most) |
+| `takeReportScreenshot('Name', fullPage: true)` | `Full page` | The whole page as one image. The report fills its pages with it and goes to the next page between two rows or sections of the page, wherever the page of the report ends |
 
 `element` is a CSS selector, or an XPath when it starts with `/`, `./` or `(`. Without `PANTHER_REPORT_PDF`,
 `takeReportScreenshot()` does nothing, so the tests run as fast as before.

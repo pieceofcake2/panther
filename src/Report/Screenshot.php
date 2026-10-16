@@ -19,6 +19,14 @@ final class Screenshot
     public const FAILURE = 'failure';
 
     /**
+     * The positions in the image where the report may cut it between two of its pages: the top and the bottom of
+     * the rows and sections of a full page (pixels from the top of the image)
+     *
+     * @var array<int>
+     */
+    public array $breaks = [];
+
+    /**
      * Constructor
      *
      * @param string $file File name in the directory of the report
