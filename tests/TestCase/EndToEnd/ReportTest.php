@@ -141,6 +141,15 @@ class ReportTest extends PantherTestCase
         $this->assertGreaterThan($result->screenshots[2]->viewportWidth - 30, $width);
     }
 
+    public function testAFullPageIsCutBetweenRows(): void
+    {
+        $recorder = $this->record(['testRows']);
+
+        $screenshots = self::result($recorder, 'testRows')->screenshots;
+        $heights = array_map(static fn(Screenshot $screenshot): int => self::imageSize($recorder, $screenshot)[1], $screenshots);
+        $this->assertSame([1200, 1200, 800, 800], $heights);
+    }
+
     public function testElementIsScrolledToTheTop(): void
     {
         if (!function_exists('imagecreatefromjpeg')) {

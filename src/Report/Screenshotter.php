@@ -178,16 +178,82 @@ final class Screenshotter
         }
 
         $images = [];
-        $parts = (int)ceil($height / self::PART_HEIGHT);
-        $partHeight = (int)ceil($height / $parts);
-        $taken = min($parts, self::MAX_PARTS);
-        for ($part = 0; $part < $taken; $part++) {
-            $y = $part * $partHeight;
-            $clip = ['x' => 0, 'y' => $y, 'width' => $width, 'height' => min($partHeight, $height - $y)];
+        foreach (self::parts($height, $this->breaks($devTools)) as [$top, $bottom]) {
+            $clip = ['x' => 0, 'y' => $top, 'width' => $width, 'height' => $bottom - $top];
             $images[] = ['jpg', $this->capture($devTools, $clip)];
         }
 
         return $images;
+    }
+
+    /**
+     * Where a page can be cut: the top and the bottom of its wide elements (rows, sections, headings...), between
+     * which no text or field is cut
+     *
+     * @param \Facebook\WebDriver\Chrome\ChromeDevToolsDriver $devTools DevTools
+     * @return array<int> Positions in the page (CSS pixels)
+     */
+    private function breaks(ChromeDevToolsDriver $devTools): array
+    {
+        $script = <<<'JS'
+            (() => {
+                const width = document.documentElement.clientWidth;
+                const breaks = new Set();
+                for (const element of document.body.querySelectorAll('*')) {
+                    const rect = element.getBoundingClientRect();
+                    if (rect.width >= width * 0.6 && rect.height > 0) {
+                        breaks.add(Math.round(rect.top + window.scrollY));
+                        breaks.add(Math.round(rect.bottom + window.scrollY));
+                    }
+                }
+                return Array.from(breaks);
+            })()
+            JS;
+        $result = $devTools->execute('Runtime.evaluate', ['expression' => $script, 'returnByValue' => true]);
+        $breaks = array_map('intval', (array)($result['result']['value'] ?? []));
+        sort($breaks);
+
+        return $breaks;
+    }
+
+    /**
+     * The parts of a page: each fits on a page of the report (`PART_HEIGHT`), they are about the same height, and
+     * each is cut at the break nearest to that height, so that no part is a sliver and no line is cut in two
+     *
+     * @param int $height Height of the page (CSS pixels)
+     * @param array<int> $breaks Where the page can be cut, sorted
+     * @return array<array{int, int}> The top and the bottom of each part, at most `MAX_PARTS`
+     */
+    public static function parts(int $height, array $breaks): array
+    {
+        $parts = [];
+        $top = 0;
+        for ($count = 0; $top < $height && $count < self::MAX_PARTS; $count++) {
+            $rest = $height - $top;
+            if ($rest <= self::PART_HEIGHT) {
+                $parts[] = [$top, $height];
+                break;
+            }
+            // The same height for the rest of the parts, at a break between half and all of a page of the report
+            $target = $top + (int)ceil($rest / ceil($rest / self::PART_HEIGHT));
+            $min = $top + intdiv(self::PART_HEIGHT, 2);
+            $max = $top + self::PART_HEIGHT;
+            $bottom = null;
+            foreach ($breaks as $break) {
+                if ($break < $min || $break > $max) {
+                    continue;
+                }
+                if ($bottom === null || abs($break - $target) < abs($bottom - $target)) {
+                    $bottom = $break;
+                }
+            }
+            // No break: at the same height, as a block taller than a page has to be cut anyway
+            $bottom ??= $target;
+            $parts[] = [$top, $bottom];
+            $top = $bottom;
+        }
+
+        return $parts;
     }
 
     /**
