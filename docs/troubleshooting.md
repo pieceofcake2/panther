@@ -24,6 +24,9 @@ the GitHub runners), the web server gets the `.env` values even where the shell 
 URL of the test database in CI. Pass such values with the `env` option:
 `static::createPantherClient(['env' => ['DATABASE_TEST_URL' => (string)env('DATABASE_TEST_URL')]])`.
 
+**Japanese text is drawn as boxes in the screenshots** — The machine has no Japanese (CJK) font, as on the GitHub
+runners. Install one, e.g. `sudo apt-get install -y fonts-noto-cjk` (see [CI](ci.md)).
+
 **The page has no CSS** — The file is not in the document root, or `PANTHER_WEB_SERVER_DIR` points to the
 wrong directory.
 

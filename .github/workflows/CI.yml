@@ -90,6 +90,16 @@ jobs:
           file: junit-unit.xml
           coverage: coverage-unit.xml
 
+      - name: Upload the error screenshots
+        id: screenshots
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: error-screenshots-php${{ matrix.php-version }}
+          path: tmp/error-screenshots/
+          retention-days: 7
+          if-no-files-found: ignore
+
       - name: End-to-End test summary
         if: ${{ !cancelled() }}
         uses: pieceofcake2/ci-summary@v1
@@ -99,16 +109,8 @@ jobs:
           file: junit-end-to-end.xml
           coverage: coverage-end-to-end.xml
           artifact-name: error-screenshots-php${{ matrix.php-version }}
+          artifact-url: ${{ steps.screenshots.outputs.artifact-url }}
           artifact-note: Screenshots of the failed tests are in the {artifact} artifact.
-
-      - name: Upload the error screenshots
-        if: ${{ failure() }}
-        uses: actions/upload-artifact@v7
-        with:
-          name: error-screenshots-php${{ matrix.php-version }}
-          path: tmp/error-screenshots/
-          retention-days: 7
-          if-no-files-found: ignore
 
       - name: Upload test results to Codecov
         if: ${{ !cancelled() }}
