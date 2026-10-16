@@ -10,6 +10,7 @@ use PieceOfCake2\Panther\Report\Recorder;
 use PieceOfCake2\Panther\Report\TestResult;
 use PieceOfCake2\Panther\ServerExtension;
 use PieceOfCake2\Panther\Test\EndToEnd\FailingPage;
+use RuntimeException;
 
 class RecorderTest extends TestCase
 {
@@ -132,6 +133,19 @@ class RecorderTest extends TestCase
 
         $this->assertSame([$ended], $names($extension));
         $this->assertSame([$ended, $nested], $names($all));
+    }
+
+    public function testATestOutsideTheReportIsIgnored(): void
+    {
+        $test = self::class . '::testATestOutsideTheReportIsIgnored';
+        $recorder = self::recorder();
+
+        $recorder->setStatus($test, TestResult::FAILED, 'Failed');
+        $recorder->setTime($test, 0.1);
+        $recorder->setException($test, new RuntimeException('Error'));
+        $recorder->takeScreenshots($test, [], 'Step', null);
+
+        $this->assertSame([], $recorder->results());
     }
 
     public function testException(): void

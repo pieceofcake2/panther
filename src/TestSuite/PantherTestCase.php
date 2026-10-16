@@ -119,6 +119,9 @@ abstract class PantherTestCase extends CakeTestCase
         try {
             $return = parent::runTest();
         } catch (SkippedTest | IncompleteTest $e) {
+            // As below, for a test run inside another test
+            $result->status = $e instanceof SkippedTest ? TestResult::SKIPPED : TestResult::INCOMPLETE;
+            $result->message = $e->getMessage();
             throw $e;
         } catch (Throwable $e) {
             // PHPUnit tells the extension the result later, but not for a test run inside another test

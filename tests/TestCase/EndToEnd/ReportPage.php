@@ -77,6 +77,17 @@ class ReportPage extends PantherTestCase
     }
 
     /**
+     * Is skipped after it opened a page
+     */
+    public function testSkipped(): void
+    {
+        $client = static::createPantherClient();
+        $client->request('GET', '/');
+
+        $this->markTestSkipped('Not ready');
+    }
+
+    /**
      * Uses no browser
      */
     public function testWithoutBrowser(): void

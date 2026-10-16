@@ -81,6 +81,16 @@ class TestDescriberTest extends TestCase
         $this->assertNull($describer->describeName('Warning'));
     }
 
+    public function testDescribeTheNameOfAnUnknownTest(): void
+    {
+        $result = (new TestDescriber())->describeName('App\NoSuchTest::testSomething');
+
+        $this->assertNotNull($result);
+        $this->assertSame('No such', $result->classTitle);
+        $this->assertSame('Something', $result->title);
+        $this->assertNull($result->description);
+    }
+
     public function testClassTitleWithoutDocComment(): void
     {
         $describer = new TestDescriber();

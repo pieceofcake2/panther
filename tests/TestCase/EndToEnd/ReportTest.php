@@ -174,6 +174,16 @@ class ReportTest extends PantherTestCase
         $this->assertSame([390, 844], self::imageSize($recorder, $screenshot));
     }
 
+    public function testASkippedTestGetsNoScreenshot(): void
+    {
+        $recorder = $this->record(['testSkipped']);
+
+        $result = self::result($recorder, 'testSkipped');
+        $this->assertSame(TestResult::SKIPPED, $result->status);
+        $this->assertSame('Not ready', $result->message);
+        $this->assertSame([], $result->screenshots);
+    }
+
     public function testATestWithoutBrowserGetsNoScreenshot(): void
     {
         $recorder = $this->record(['testWithoutBrowser']);
