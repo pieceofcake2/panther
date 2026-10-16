@@ -20,9 +20,21 @@ final class HtmlRenderer
     public const TEMPLATE_DIR = __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'resources' . DIRECTORY_SEPARATOR . 'report';
 
     /**
-     * Millimeters per CSS pixel of a full page in the report (a page 1366 pixels wide fills the 180 mm of A4)
+     * Millimeters per CSS pixel of the screenshots in the report, the same for every mode: a viewport of 1200 x 957
+     * is 120 x 96 mm (two fit on a page), and a part of a full page (1500 pixels at most) 150 mm high
      */
-    public const MM_PER_PIXEL = 180 / 1366;
+    public const MM_PER_PIXEL = 0.1;
+
+    /**
+     * Millimeters per CSS pixel of the screenshots of a narrow viewport (a phone), whose text would be too small:
+     * a viewport of 390 x 844 is 55 x 118 mm, and a part of a full page still fits on a page
+     */
+    public const MM_PER_PIXEL_NARROW = 0.14;
+
+    /**
+     * A viewport narrower than this is a phone (CSS pixels), as the usual breakpoint of a tablet
+     */
+    public const NARROW_WIDTH = 768;
 
     /**
      * Constructor
@@ -258,20 +270,15 @@ final class HtmlRenderer
                 if ($screenshot->parts > 1) {
                     $mode .= ' ' . $screenshot->part . '/' . $screenshot->parts;
                 }
-                $class = $screenshot->height > $screenshot->width ? 'portrait' : '';
-                $style = '';
-                if ($screenshot->mode === 'Full page' || str_starts_with($screenshot->mode, 'Fit to page')) {
-                    // A full page (or a page of it) keeps the scale of the report, so that it fills a page
-                    $class = 'full';
-                    $style = sprintf('width: %.1fmm', $screenshot->viewportWidth * self::MM_PER_PIXEL);
-                }
+                // The same scale for every screenshot: the width of the image in CSS pixels (without a scroll bar)
+                $scale = $screenshot->viewportWidth < self::NARROW_WIDTH ? self::MM_PER_PIXEL_NARROW : self::MM_PER_PIXEL;
+                $width = $screenshot->viewportWidth > 0 ? min($screenshot->width, $screenshot->viewportWidth) : $screenshot->width;
                 $images[] = [
                     'file' => $screenshot->file,
                     'mode' => $mode,
                     'path' => $screenshot->path,
                     'title' => $screenshot->title,
-                    'class' => $class,
-                    'style' => $style,
+                    'style' => sprintf('width: %.1fmm', $width * $scale),
                 ];
             }
             $view[] = ['label' => $label, 'images' => $images];

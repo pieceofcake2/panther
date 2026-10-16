@@ -104,16 +104,17 @@ class HtmlRendererTest extends TestCase
         $this->assertStringContainsString('<span class="badge skip">Skipped</span>', $html);
         $this->assertStringContainsString('1.8s', $html);
 
-        // The steps and their captions; a full page keeps the scale of the report
+        // The steps and their captions
         $this->assertStringContainsString('<span class="name">1. Search form</span>', $html);
         $this->assertStringContainsString('<span class="kind">Viewport 1366×768</span><span class="path">/career/</span><span class="page-title">Careers &lt;Hilton&gt;</span>', $html);
         $this->assertStringContainsString('<span class="kind">Full page 2/2</span>', $html);
-        $this->assertStringContainsString('style="width: 180.0mm"', $html);
+        // The same scale for every mode: 0.1 mm per CSS pixel, 0.14 mm for a phone
+        $this->assertSame(3, substr_count($html, 'style="width: 136.6mm"'));
         $this->assertStringContainsString('<span class="name">At the failure</span>', $html);
         // The images of a step are together, and the list repeats its header on each page
         $this->assertSame(3, substr_count($html, '<div class="step">'));
         $this->assertStringContainsString('<thead><tr><th>No.</th>', $html);
-        $this->assertStringContainsString('<figure class="portrait">', $html);
+        $this->assertStringContainsString('style="width: 54.6mm"', $html);
 
         // The failure, escaped, with its file and line; the description of the test
         $this->assertStringContainsString("Failed asserting that &quot;&lt;b&gt;&quot; contains &quot;x&quot;.\ntests/TestCase/EndToEnd/ApplyTest.php:42", $html);

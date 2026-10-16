@@ -69,11 +69,8 @@ td .mono.sub { font-size: 7.5pt; }
 .step figure + figure { margin-top: 7mm; }
 /* The image in the center, its caption on the left across the page */
 figure { margin: 0; break-inside: avoid; width: 100%; }
-figure img { display: block; margin: 0 auto; max-width: 100%; max-height: 86mm; border: 1px solid var(--line); }
-/* A portrait screenshot (a phone) keeps its ratio and gets taller */
-figure.portrait img { max-height: 120mm; }
-/* A part of a full page keeps the scale of the report; it goes to the next page only when it does not fit */
-figure.full img { max-height: none; height: auto; }
+/* The width of an image is set by its scale (HtmlRenderer::MM_PER_PIXEL); a figure goes to the next page when it does not fit */
+figure img { display: block; margin: 0 auto; max-width: 100%; height: auto; border: 1px solid var(--line); }
 figcaption { font-size: 8pt; line-height: 1.5; margin-top: 1.5mm; }
 figcaption .name { display: block; font-weight: 700; }
 figcaption .kind { display: inline-block; color: #fff; background: #6b6b6b; border-radius: 2px; padding: 0 5px; margin-right: 2mm; font-size: 7pt; }

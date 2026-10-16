@@ -123,7 +123,7 @@
             <?php foreach ($test['steps'] as $step) : ?>
                 <div class="step">
                 <?php foreach ($step['images'] as $image) : ?>
-                    <figure class="<?= $h($image['class']) ?>">
+                    <figure>
                     <img src="<?= $h(rawurlencode($image['file'])) ?>" alt="" style="<?= $h($image['style']) ?>">
                     <figcaption>
                     <span class="name"><?= $h($step['label']) ?></span>

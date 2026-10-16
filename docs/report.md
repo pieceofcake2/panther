@@ -102,7 +102,9 @@ public function testApply(): void
 
 The screenshots are JPEG images of one pixel per CSS pixel, so that the screenshots of a phone emulated with a
 `deviceScaleFactor` of 3 are not 9 times as large; `PANTHER_REPORT_JPEG_QUALITY` sets their quality (default
-`60`). Each one has its mode, the path of the page and its title. With Firefox, the screenshots are the PNG
+`60`). Each one has its mode, the path of the page and its title. In the report, all the screenshots have the same
+scale, 0.1 mm per CSS pixel (0.14 mm for a viewport narrower than 768 pixels, a phone), so that a viewport of
+1200 x 957 is 120 x 96 mm and two of them fit on a page. With Firefox, the screenshots are the PNG
 images of the viewport of WebDriver.
 
 ## Failures
