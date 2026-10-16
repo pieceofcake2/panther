@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## Unreleased
+## 1.0.3
 
 - `PantherTestCase` closes the DevTools of Chrome unless `PANTHER_DEVTOOLS` is set, as Panther 2.3+ does. Panther
   before 2.3 (installed on PHP 8.0) opened them docked in the window, which made the page 645 pixels wide instead of
