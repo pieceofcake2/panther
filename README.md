@@ -76,9 +76,6 @@ It is a library (PSR-4, `PieceOfCake2\Panther\`), not a CakePHP plugin: there is
    (see [docs/examples/phpunit.xml.dist](docs/examples/phpunit.xml.dist)):
 
    ```xml
-   <php>
-       <server name="PANTHER_ERROR_SCREENSHOT_DIR" value="./tmp/error-screenshots"/>
-   </php>
    <extensions>
        <extension class="PieceOfCake2\Panther\ServerExtension"/>
    </extensions>

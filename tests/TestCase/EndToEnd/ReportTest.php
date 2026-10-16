@@ -121,19 +121,37 @@ class ReportTest extends PantherTestCase
         $this->assertSame([
             [1, 'Top page', 'Viewport', 1, 1],
             [2, 'Red block', 'Element: #target', 1, 1],
-            [3, 'Whole page', 'Full page', 1, 4],
-            [3, 'Whole page', 'Full page', 2, 4],
-            [3, 'Whole page', 'Full page', 3, 4],
-            [3, 'Whole page', 'Full page', 4, 4],
+            [3, 'Whole page', 'Full page', 1, 1],
+            [4, 'A page of the report', 'Fit to page', 1, 1],
+            [5, 'A page from the red block', 'Fit to page: #target', 1, 1],
         ], $steps);
 
-        // The parts of a full page of 5000 pixels: 1500, 1500, 1500 and 500 pixels high, as wide as the page
-        // (the viewport without its scroll bar, which takes 15 pixels on Linux)
-        $sizes = array_map(static fn(Screenshot $screenshot): array => self::imageSize($recorder, $screenshot), array_slice($result->screenshots, 2));
-        $width = $sizes[0][0];
-        $this->assertSame([[$width, 1500], [$width, 1500], [$width, 1500], [$width, 500]], $sizes);
+        // A full page of 5000 pixels is one image, as wide as the page (the viewport without its scroll bar, 15 pixels
+        // on Linux), with where the report can cut it: between the blue and the red blocks
+        [$width, $height] = self::imageSize($recorder, $result->screenshots[2]);
+        $this->assertSame(5000, $height);
+        $this->assertContains(3000, $result->screenshots[2]->breaks);
+        // What fits on a page of the report under the title: 1900 pixels from the top of the page, or of the element
+        // (as wide as the viewport, with or without the scroll bar)
+        foreach ([$result->screenshots[3], $result->screenshots[4]] as $screenshot) {
+            [$fitWidth, $fitHeight] = self::imageSize($recorder, $screenshot);
+            $this->assertSame(1900, $fitHeight);
+            $this->assertGreaterThan($screenshot->viewportWidth - 30, $fitWidth);
+            $this->assertLessThanOrEqual($screenshot->viewportWidth, $fitWidth);
+        }
         $this->assertLessThanOrEqual($result->screenshots[2]->viewportWidth, $width);
         $this->assertGreaterThan($result->screenshots[2]->viewportWidth - 30, $width);
+    }
+
+    public function testAFullPageCanBeCutBetweenItsRows(): void
+    {
+        $recorder = $this->record(['testRows']);
+
+        $screenshots = self::result($recorder, 'testRows')->screenshots;
+        $this->assertCount(1, $screenshots);
+        $this->assertSame(4000, self::imageSize($recorder, $screenshots[0])[1]);
+        // Between the rows of 400 pixels
+        $this->assertSame(range(400, 3600, 400), array_values(array_intersect($screenshots[0]->breaks, range(400, 3600, 400))));
     }
 
     public function testElementIsScrolledToTheTop(): void
@@ -143,14 +161,17 @@ class ReportTest extends PantherTestCase
         }
         $recorder = $this->record(['testSteps']);
 
-        $screenshot = self::result($recorder, 'testSteps')->screenshots[1];
-        $image = imagecreatefromjpeg($recorder->dir() . DS . $screenshot->file);
-        $this->assertNotFalse($image);
-        $rgb = imagecolorat($image, 10, 10);
+        $screenshots = self::result($recorder, 'testSteps')->screenshots;
+        // The viewport scrolled to the element, and a page of the report from the element
+        foreach ([$screenshots[1], $screenshots[4]] as $screenshot) {
+            $image = imagecreatefromjpeg($recorder->dir() . DS . $screenshot->file);
+            $this->assertNotFalse($image);
+            $rgb = imagecolorat($image, 10, 10);
 
-        // The red block, not the blue one above it
-        $this->assertGreaterThan(200, ($rgb >> 16) & 0xff);
-        $this->assertLessThan(60, $rgb & 0xff);
+            // The red block, not the blue one above it
+            $this->assertGreaterThan(200, ($rgb >> 16) & 0xff, $screenshot->mode);
+            $this->assertLessThan(60, $rgb & 0xff, $screenshot->mode);
+        }
     }
 
     public function testAFailedTestGetsTheScreenshotOfTheFailure(): void

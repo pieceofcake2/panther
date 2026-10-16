@@ -19,6 +19,19 @@ PANTHER_REPORT_PDF=tmp/end-to-end-report.pdf vendor/bin/phpunit --testsuite EndT
 報告書に載るのは `PantherTestCase` のテストで、PHPUnit が数えるものと同じです。テストの中で実行した
 テストは載りません。
 
+<a id="sample"></a>
+
+## 見本
+
+このパッケージのテスト用アプリケーションで、[docs/examples/report](https://github.com/pieceofcake2/panther/tree/1.x/docs/examples/report) のテストを実行して作った
+報告書です。途中の画面・ページ全体・スマホ・データプロバイダーのほか、見本として失敗するテストとスキップする
+テストを 1 つずつ含みます。
+
+- [見本の報告書 (日本語、PDF)](/report-sample-ja.pdf)
+- [見本の報告書 (英語、PDF)](/report-sample.pdf)
+
+![表紙、テスト一覧、途中の画面を撮ったテスト、失敗したテストのページ](../img/report-sample-ja.png)
+
 <a id="requirements"></a>
 
 ## 必要なもの
@@ -100,14 +113,17 @@ public function testApply(): void
 | --- | --- | --- |
 | `takeReportScreenshot('名前')` | `Viewport` | ブラウザに見えている範囲 (スクロールしている位置のまま) |
 | `takeReportScreenshot('名前', element: '.jobs')` | `Element: .jobs` | 要素をいちばん上までスクロールした後の見えている範囲。画面の下にある部分を撮るとき |
-| `takeReportScreenshot('名前', fullPage: true)` | `Full page` | ページ全体。1500 CSS ピクセルごとに分け、それぞれ報告書の 1 ページに載せる (最大 20) |
+| `takeReportScreenshot('名前', fitToPage: true)` | `Fit to page` | ページの上から (`element` を指定したときはその要素の上から)、テストのページの見出しの下に収まる分 (190mm) |
+| `takeReportScreenshot('名前', fullPage: true)` | `Full page` | ページ全体を 1 枚の画像で撮る。報告書ではページの下まで載せ、報告書のページが終わるところで、ページの行・区画の境目から次のページに送る |
 
 `element` は CSS セレクター、または `/`・`./`・`(` で始まる XPath です。`PANTHER_REPORT_PDF` が無いときは
 `takeReportScreenshot()` は何もしないので、テストの速さは変わりません。
 
 スクリーンショットは、CSS の 1 ピクセルを 1 ピクセルとする JPEG です。`deviceScaleFactor` を 3 にした
 スマホのエミュレーションでも、画像が 9 倍の大きさになりません。画質は `PANTHER_REPORT_JPEG_QUALITY`
-(既定は `60`) で変えられます。各画像には撮り方、ページのパスとタイトルを添えます。Firefox では、WebDriver の
+(既定は `60`) で変えられます。各画像には撮り方、ページのパスとタイトルを添えます。報告書では、どのスクリーンショットも同じ縮尺
+(CSS の 1 ピクセルが 0.1mm。幅 768 ピクセル未満のスマホは 0.14mm) で載せます。1200×957 の画面は 120×96mm で、
+1 ページに 2 枚載ります。Firefox では、WebDriver の
 見えている範囲の PNG になります。
 
 <a id="failures"></a>

@@ -44,9 +44,10 @@ class HtmlRendererTest extends TestCase
         $passed->time = 1.84;
         $passed->screenshots = [
             new Screenshot('0001-01-01.jpg', 1, 'Search form', null, 'Viewport', 1, 1, '/career/', 'Careers <Hilton>', 1366, 768, 1366, 768),
-            new Screenshot('0001-02-01.jpg', 2, 'Whole list', null, 'Full page', 1, 2, '/career/', 'Careers', 1366, 768, 1366, 1500),
-            new Screenshot('0001-02-02.jpg', 2, 'Whole list', null, 'Full page', 2, 2, '/career/', 'Careers', 1366, 768, 1366, 400),
+            new Screenshot('0001-02-01.jpg', 2, 'Whole list', null, 'Full page', 1, 1, '/career/', 'Careers', 1366, 768, 1366, 1900),
         ];
+        // Breaks out of the image and twice the same are ignored
+        $passed->screenshots[1]->breaks = [0, 500, 1200, 1200, 1900, 2000];
         $recorder->add($passed);
 
         $failed = new TestResult('App\ApplyTest::testErrors', 'App\ApplyTest', 'testErrors', 'Applications', 'Shows the errors', null, false, 'The required fields are checked.');
@@ -104,13 +105,23 @@ class HtmlRendererTest extends TestCase
         $this->assertStringContainsString('<span class="badge skip">Skipped</span>', $html);
         $this->assertStringContainsString('1.8s', $html);
 
-        // The steps and their captions; a full page keeps the scale of the report
-        $this->assertStringContainsString('<span class="step">1. Search form</span>', $html);
+        // The steps and their captions
+        $this->assertStringContainsString('<span class="name">1. Search form</span>', $html);
         $this->assertStringContainsString('<span class="kind">Viewport 1366×768</span><span class="path">/career/</span><span class="page-title">Careers &lt;Hilton&gt;</span>', $html);
-        $this->assertStringContainsString('<span class="kind">Full page 2/2</span>', $html);
-        $this->assertStringContainsString('style="width: 180.0mm"', $html);
-        $this->assertStringContainsString('<span class="step">At the failure</span>', $html);
-        $this->assertStringContainsString('<figure class="portrait">', $html);
+        // The parts of a full page follow each other with one caption
+        $this->assertSame(1, substr_count($html, '<span class="kind">Full page</span>'));
+        // A full page is bands of its image between its breaks, which the pages of the report do not split
+        $this->assertSame(3, substr_count($html, '<div class="band"'));
+        $this->assertStringContainsString('<div class="band" style="height: 50.100mm"><img src="0001-02-01.jpg" alt="" style="width: 136.600mm; margin-top: 0.000mm"></div>', $html);
+        $this->assertStringContainsString('<div class="band" style="height: 70.100mm"><img src="0001-02-01.jpg" alt="" style="width: 136.600mm; margin-top: -50.000mm"></div>', $html);
+        $this->assertStringContainsString('<div class="band" style="height: 70.000mm"><img src="0001-02-01.jpg" alt="" style="width: 136.600mm; margin-top: -120.000mm"></div>', $html);
+        // The same scale for every mode: 0.1 mm per CSS pixel, 0.14 mm for a phone
+        $this->assertSame(2, substr_count($html, 'style="width: 136.6mm"'));
+        $this->assertStringContainsString('<span class="name">At the failure</span>', $html);
+        // The images of a step are together, and the list repeats its header on each page
+        $this->assertSame(3, substr_count($html, '<figure class="step">'));
+        $this->assertStringContainsString('<thead><tr><th>No.</th>', $html);
+        $this->assertStringContainsString('style="width: 54.6mm"', $html);
 
         // The failure, escaped, with its file and line; the description of the test
         $this->assertStringContainsString("Failed asserting that &quot;&lt;b&gt;&quot; contains &quot;x&quot;.\ntests/TestCase/EndToEnd/ApplyTest.php:42", $html);
@@ -128,7 +139,7 @@ class HtmlRendererTest extends TestCase
         $this->assertStringContainsString('<h1>受入テスト報告書</h1>', $html);
         $this->assertStringContainsString('<div class="label">不合格</div>', $html);
         $this->assertStringContainsString('Lists the jobs（データ: career）', $html);
-        $this->assertStringContainsString('<span class="step">失敗した時点の画面</span>', $html);
+        $this->assertStringContainsString('<span class="name">失敗した時点の画面</span>', $html);
         $this->assertStringContainsString('<b>失敗の内容</b>', $html);
         // The modes of the screenshots are not translated
         $this->assertStringContainsString('<span class="kind">Viewport 390×844</span>', $html);

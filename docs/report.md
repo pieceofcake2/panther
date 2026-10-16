@@ -19,6 +19,16 @@ The report is A4, with a header and page numbers on every page:
 Only the tests of `PantherTestCase` are in the report, as PHPUnit counts them: a test that a test runs itself
 is not.
 
+## Sample
+
+The report of the tests of [docs/examples/report](https://github.com/pieceofcake2/panther/tree/1.x/docs/examples/report) on the fixture application of this package:
+steps, a full page, a phone, a data provider, and a test that fails and one that is skipped on purpose.
+
+- [Sample report (English, PDF)](/report-sample.pdf)
+- [Sample report (Japanese, PDF)](/report-sample-ja.pdf)
+
+![The cover, the list of the tests, a test with its steps, and a failed test](img/report-sample.png)
+
 ## Requirements
 
 - The extension, `PieceOfCake2\Panther\ServerExtension` ([Configuration](configuration.md#phpunitxmldist))
@@ -94,14 +104,17 @@ public function testApply(): void
 | --- | --- | --- |
 | `takeReportScreenshot('Name')` | `Viewport` | What the browser shows, where it is scrolled to |
 | `takeReportScreenshot('Name', element: '.jobs')` | `Element: .jobs` | The viewport after the element is scrolled to the top, for a part of the page below the fold |
-| `takeReportScreenshot('Name', fullPage: true)` | `Full page` | The whole page, in parts of 1500 CSS pixels, a page of the report for each (20 parts at most) |
+| `takeReportScreenshot('Name', fitToPage: true)` | `Fit to page` | What fits on the page of the test under its title (190 mm) from the top of the page, or from the top of `element` |
+| `takeReportScreenshot('Name', fullPage: true)` | `Full page` | The whole page as one image. The report fills its pages with it and goes to the next page between two rows or sections of the page, wherever the page of the report ends |
 
 `element` is a CSS selector, or an XPath when it starts with `/`, `./` or `(`. Without `PANTHER_REPORT_PDF`,
 `takeReportScreenshot()` does nothing, so the tests run as fast as before.
 
 The screenshots are JPEG images of one pixel per CSS pixel, so that the screenshots of a phone emulated with a
 `deviceScaleFactor` of 3 are not 9 times as large; `PANTHER_REPORT_JPEG_QUALITY` sets their quality (default
-`60`). Each one has its mode, the path of the page and its title. With Firefox, the screenshots are the PNG
+`60`). Each one has its mode, the path of the page and its title. In the report, all the screenshots have the same
+scale, 0.1 mm per CSS pixel (0.14 mm for a viewport narrower than 768 pixels, a phone), so that a viewport of
+1200 x 957 is 120 x 96 mm and two of them fit on a page. With Firefox, the screenshots are the PNG
 images of the viewport of WebDriver.
 
 ## Failures

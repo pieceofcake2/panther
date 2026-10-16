@@ -67,9 +67,6 @@ vendor/bin/bdi detect drivers
 1. `phpunit.xml.dist` で拡張を登録します ([設定](configuration.md#phpunitxmldist))。
 
    ```xml
-   <php>
-       <server name="PANTHER_ERROR_SCREENSHOT_DIR" value="./tmp/error-screenshots"/>
-   </php>
    <extensions>
        <extension class="PieceOfCake2\Panther\ServerExtension"/>
    </extensions>

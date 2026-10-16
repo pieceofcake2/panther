@@ -145,6 +145,7 @@ abstract class PantherTestCase extends CakeTestCase
      * $this->takeReportScreenshot('Confirmation');
      * $this->takeReportScreenshot('Errors', element: '.error-message');
      * $this->takeReportScreenshot('Whole page', fullPage: true);
+     * $this->takeReportScreenshot('A page of the report', fitToPage: true);
      * ```
      *
      * A test that takes screenshots this way gets no screenshot of its end when it passes.
@@ -152,16 +153,18 @@ abstract class PantherTestCase extends CakeTestCase
      * @param string $name Name of the step in the report
      * @param string|null $element CSS selector or XPath of an element to scroll to the top before taking the viewport
      * @param bool $fullPage Takes the whole page (in parts of a page of the report) instead of the viewport
+     * @param bool $fitToPage Takes what fits on a page of the report, from the top of the page (or of `$element`),
+     *   instead of the viewport
      * @return void
      */
-    public function takeReportScreenshot(string $name, ?string $element = null, bool $fullPage = false): void
+    public function takeReportScreenshot(string $name, ?string $element = null, bool $fullPage = false, bool $fitToPage = false): void
     {
         $recorder = Recorder::current();
         if ($recorder === null) {
             return;
         }
 
-        $recorder->takeScreenshots($this->toString(), self::clientsOfTest(), $name, null, $element, $fullPage);
+        $recorder->takeScreenshots($this->toString(), self::clientsOfTest(), $name, null, $element, $fullPage, $fitToPage);
     }
 
     /**

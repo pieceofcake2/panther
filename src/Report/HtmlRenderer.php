@@ -20,9 +20,14 @@ final class HtmlRenderer
     public const TEMPLATE_DIR = __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'resources' . DIRECTORY_SEPARATOR . 'report';
 
     /**
-     * Millimeters per CSS pixel of a full page in the report (a page 1366 pixels wide fills the 180 mm of A4)
+     * The most width of a screenshot (mm): the width of the page
      */
-    public const MM_PER_PIXEL = 180 / 1366;
+    public const MAX_WIDTH_MM = 179;
+
+    /**
+     * How much a band of a full page goes under the next one (mm), so that no seam shows between them
+     */
+    public const BAND_OVERLAP_MM = 0.1;
 
     /**
      * Constructor
@@ -230,10 +235,10 @@ final class HtmlRenderer
     }
 
     /**
-     * The screenshots of a test by step
+     * The screenshots of a test by step, with one caption each
      *
      * @param \PieceOfCake2\Panther\Report\TestResult $result Result
-     * @return array<array{label: string, images: array<array<string, mixed>>}>
+     * @return array<array{label: string, mode: string, path: string, title: string, images: array<array<string, mixed>>}>
      */
     private function steps(TestResult $result): array
     {
@@ -249,35 +254,63 @@ final class HtmlRenderer
             if (count($steps) > 1) {
                 $label = $this->t('screenshot.step', ['number' => $number, 'name' => $label]);
             }
+            $mode = $first->mode;
+            if ($mode === 'Viewport') {
+                $mode .= ' ' . $first->viewportWidth . '×' . $first->viewportHeight;
+            }
             $images = [];
             foreach ($screenshots as $screenshot) {
-                $mode = $screenshot->mode;
-                if ($mode === 'Viewport') {
-                    $mode .= ' ' . $screenshot->viewportWidth . '×' . $screenshot->viewportHeight;
-                }
-                if ($screenshot->parts > 1) {
-                    $mode .= ' ' . $screenshot->part . '/' . $screenshot->parts;
-                }
-                $class = $screenshot->height > $screenshot->width ? 'portrait' : '';
-                $style = '';
-                if ($screenshot->mode === 'Full page') {
-                    // A full page keeps the scale of the report, so that its parts fill the pages
-                    $class = 'full';
-                    $style = sprintf('width: %.1fmm', $screenshot->viewportWidth * self::MM_PER_PIXEL);
+                // The same scale for every screenshot: the width of the image in CSS pixels (without a scroll bar),
+                // narrower for a viewport wider than the page
+                $width = $screenshot->viewportWidth > 0 ? min($screenshot->width, $screenshot->viewportWidth) : $screenshot->width;
+                $scale = Screenshotter::scale($screenshot->viewportWidth);
+                if ($width > 0 && $width * $scale > self::MAX_WIDTH_MM) {
+                    $scale = self::MAX_WIDTH_MM / $width;
                 }
                 $images[] = [
                     'file' => $screenshot->file,
-                    'mode' => $mode,
-                    'path' => $screenshot->path,
-                    'title' => $screenshot->title,
-                    'class' => $class,
-                    'style' => $style,
+                    'style' => sprintf('width: %.1fmm', $width * $scale),
+                    // An image of a full page after the first one follows it without a gap
+                    'continued' => $screenshot->part > 1,
+                    'bands' => $screenshot->mode === 'Full page' ? self::bands($screenshot, $width * $scale, $scale) : [],
                 ];
             }
-            $view[] = ['label' => $label, 'images' => $images];
+            $view[] = ['label' => $label, 'mode' => $mode, 'path' => $first->path, 'title' => $first->title, 'images' => $images];
         }
 
         return $view;
+    }
+
+    /**
+     * The bands of an image of a full page: the image between two of its breaks (rows, sections), each one shown
+     * through a block that is not split between two pages, so that the page fills its pages and is cut between its
+     * rows. The block clips the image: as a background, Chrome would embed the image once per band
+     *
+     * Each band but the last is 0.1 mm taller than its part of the image, under the next one, so that no seam
+     * shows between them.
+     *
+     * @param \PieceOfCake2\Panther\Report\Screenshot $screenshot Screenshot of a full page
+     * @param float $width Width of the image in the report (mm)
+     * @param float $scale Millimeters per pixel
+     * @return array<array{style: string, imageStyle: string}>
+     */
+    private static function bands(Screenshot $screenshot, float $width, float $scale): array
+    {
+        $height = $screenshot->height;
+        $positions = array_filter($screenshot->breaks, static fn(int $break): bool => $break > 0 && $break < $height);
+        $positions = array_values(array_unique(array_merge([0], $positions, [$height])));
+        sort($positions);
+
+        $bands = [];
+        $last = count($positions) - 2;
+        for ($i = 0; $i <= $last; $i++) {
+            $bands[] = [
+                'style' => sprintf('height: %.3fmm', ($positions[$i + 1] - $positions[$i]) * $scale + ($i < $last ? self::BAND_OVERLAP_MM : 0)),
+                'imageStyle' => sprintf('width: %.3fmm; margin-top: %.3fmm', $width, -$positions[$i] * $scale),
+            ];
+        }
+
+        return $bands;
     }
 
     /**

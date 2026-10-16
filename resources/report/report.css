@@ -41,12 +41,17 @@ td .mono.sub { font-size: 7.5pt; }
 .verdict .counts div { flex: 1; text-align: center; padding: 3mm 0; border-left: 1px solid var(--line); }
 .verdict .counts b { display: block; font-size: 17pt; white-space: nowrap; }
 .verdict .counts span { font-size: 8pt; color: var(--sub); }
-.cover h2 { font-size: 11pt; margin: 6mm 0 2mm; padding-left: 3mm; border-left: 4px solid var(--ink); }
+.cover h2 { font-size: 11pt; margin: 7mm 0 2mm; }
 .kv th { width: 32mm; }
 
 .list { break-after: page; }
 .list h2 { font-size: 13pt; margin-bottom: 3mm; }
-.list h3 { font-size: 10pt; margin: 4mm 0 1.5mm; }
+.list h3 { font-size: 10pt; margin: 0 0 1.5mm; break-after: avoid; }
+/* Space between the classes */
+.group-list + .group-list { margin-top: 9mm; }
+/* A table over two pages repeats its header; a row is not split */
+.list thead { display: table-header-group; }
+.list tr { break-inside: avoid; }
 .list td a { color: inherit; text-decoration: none; }
 
 .test { break-before: page; }
@@ -60,18 +65,25 @@ td .mono.sub { font-size: 7.5pt; }
 .message.fail { border-color: var(--fail); background: #fdf3f2; }
 .message.fail b { color: var(--fail); }
 .message pre { white-space: pre-wrap; overflow-wrap: anywhere; margin: 1mm 0 0; font-size: 7.5pt; }
-/* The screenshots, one under the other */
-.shots { display: flex; flex-direction: column; gap: 4mm; margin-top: 3mm; }
+/* The steps one under the other, separated by a line; the images of a step with some space between them */
+.shots { margin-top: 4mm; }
+.step + .step { border-top: 0.75pt solid var(--line); margin-top: 6mm; padding-top: 6mm; }
 /* The image in the center, its caption on the left across the page */
-figure { margin: 0; break-inside: avoid; width: 100%; }
-figure img { display: block; margin: 0 auto; max-width: 100%; max-height: 86mm; border: 1px solid var(--line); }
-/* A portrait screenshot (a phone) keeps its ratio and gets taller */
-figure.portrait img { max-height: 120mm; }
-/* A part of a full page keeps the scale of the report and gets a page of its own */
-figure.full img { max-height: none; height: auto; }
-figure.full + figure.full { break-before: page; }
-figcaption { font-size: 8pt; line-height: 1.5; margin-top: 1.5mm; }
-figcaption .step { display: block; font-weight: 700; }
+figure { margin: 0; width: 100%; }
+/* The width of an image is set by its scale (Screenshotter::MM_PER_PIXEL); an image goes to the next page when it
+   does not fit. The parts of a full page follow each other as one image, cut only between the pages */
+figure img { display: block; margin: 0 auto; max-width: 100%; height: auto; border: 1px solid var(--line); break-inside: avoid; }
+figure > * + * { margin-top: 7mm; }
+/* A full page: bands of the image (between its rows and sections) that are not split, so that the image fills its
+   pages and goes to the next page between two rows (HtmlRenderer::bands()) */
+.bands { margin: 0 auto; border: 1px solid var(--line); }
+.band { overflow: hidden; break-inside: avoid; }
+.band img { display: block; max-width: none; border: 0; }
+.band + .band { margin-top: -0.1mm; }
+figure > .continued { margin-top: 0; border-top: 0; }
+figure > :has(+ .continued) { border-bottom: 0; }
+figcaption { font-size: 8pt; line-height: 1.5; margin-top: 1.5mm; break-before: avoid; }
+figcaption .name { display: block; font-weight: 700; }
 figcaption .kind { display: inline-block; color: #fff; background: #6b6b6b; border-radius: 2px; padding: 0 5px; margin-right: 2mm; font-size: 7pt; }
 figcaption .path { font-family: "SF Mono", Menlo, "DejaVu Sans Mono", monospace; font-size: 7.5pt; background: var(--soft); border: 0.5pt solid var(--line); border-radius: 2px; padding: 0 4px; margin-right: 2mm; overflow-wrap: anywhere; }
 figcaption .page-title { color: var(--sub); }

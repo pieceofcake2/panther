@@ -10,10 +10,6 @@ Register the extension and add an `EndToEnd` suite
 
 ```xml
 <phpunit bootstrap="./tests/bootstrap.php" defaultTestSuite="App">
-    <php>
-        <!-- Screenshots of the failed End-to-End tests -->
-        <server name="PANTHER_ERROR_SCREENSHOT_DIR" value="./tmp/error-screenshots"/>
-    </php>
     <extensions>
         <extension class="PieceOfCake2\Panther\ServerExtension"/>
     </extensions>

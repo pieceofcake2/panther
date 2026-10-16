@@ -42,8 +42,23 @@ class ReportPage extends PantherTestCase
         $client->executeScript(self::TALL_PAGE);
         $this->takeReportScreenshot('Red block', '#target');
         $this->takeReportScreenshot('Whole page', null, true);
+        $this->takeReportScreenshot('A page of the report', null, false, true);
+        $this->takeReportScreenshot('A page from the red block', '#target', false, true);
 
         $this->assertSelectorExists('#target');
+    }
+
+    /**
+     * Takes a page of rows of 400 pixels
+     */
+    public function testRows(): void
+    {
+        $client = static::createPantherClient();
+        $client->request('GET', '/');
+        $client->executeScript('document.body.style.margin = "0"; document.body.innerHTML = Array.from({length: 10}, (_, i) => `<p style="height: 400px; margin: 0; background: ${i % 2 ? "#eee" : "#ccc"}">Row ${i}</p>`).join("");');
+        $this->takeReportScreenshot('Rows', null, true);
+
+        $this->assertSelectorExists('p');
     }
 
     /**

@@ -171,8 +171,10 @@ expose the status code. Use `IntegrationTestTrait` for them.
 
 ## Error screenshots and the interactive mode
 
-With `PANTHER_ERROR_SCREENSHOT_DIR` and the extension, a test that fails or errors after it created a browser
-saves a screenshot of each browser, named after the date, the kind of failure and the test:
+The [test report](report.md) has a screenshot of every test, failed or not. To also save a PNG file for each
+failed test, set `PANTHER_ERROR_SCREENSHOT_DIR` (it is not set by default): with it and the extension, a test that
+fails or errors after it created a browser saves a screenshot of each browser, named after the date, the kind of
+failure and the test:
 
 ![Screenshot saved for a failed test](img/failure-screenshot.png)
 

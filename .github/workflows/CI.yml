@@ -84,6 +84,7 @@ jobs:
 
       # The test report of the End-to-End tests, as a PDF (not a zip)
       - name: Upload the test report
+        id: report
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v7
         with:
@@ -101,16 +102,6 @@ jobs:
           file: junit-unit.xml
           coverage: coverage-unit.xml
 
-      - name: Upload the error screenshots
-        id: screenshots
-        if: ${{ failure() }}
-        uses: actions/upload-artifact@v7
-        with:
-          name: error-screenshots-php${{ matrix.php-version }}
-          path: tmp/error-screenshots/
-          retention-days: 7
-          if-no-files-found: ignore
-
       - name: End-to-End test summary
         if: ${{ !cancelled() }}
         uses: pieceofcake2/ci-summary@v1
@@ -119,9 +110,9 @@ jobs:
           title: End-to-End tests — PHP ${{ matrix.php-version }}
           file: junit-end-to-end.xml
           coverage: coverage-end-to-end.xml
-          artifact-name: error-screenshots-php${{ matrix.php-version }}
-          artifact-url: ${{ steps.screenshots.outputs.artifact-url }}
-          artifact-note: Screenshots of the failed tests are in the {artifact} artifact.
+          artifact-name: end-to-end-report-php${{ matrix.php-version }}.pdf
+          artifact-url: ${{ steps.report.outputs.artifact-url }}
+          artifact-note: The test report is {artifact}.
 
       - name: Upload test results to Codecov
         if: ${{ !cancelled() }}

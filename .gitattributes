@@ -36,3 +36,6 @@
 *.woff binary
 *.ttf binary
 *.eot binary
+
+# The sample reports of the documentation site (docs/public), not in the Composer package
+/docs/public export-ignore

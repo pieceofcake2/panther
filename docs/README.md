@@ -59,9 +59,6 @@ Add `/drivers/` to `.gitignore`.
    ([Configuration](configuration.md#phpunitxmldist)):
 
    ```xml
-   <php>
-       <server name="PANTHER_ERROR_SCREENSHOT_DIR" value="./tmp/error-screenshots"/>
-   </php>
    <extensions>
        <extension class="PieceOfCake2\Panther\ServerExtension"/>
    </extensions>
