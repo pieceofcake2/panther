@@ -34,6 +34,11 @@ foreach (['cache/models', 'cache/persistent', 'logs'] as $dir) {
     }
 }
 
+// The tmp directory of the repository, where DATABASE_URL of tests/test_app/config/.env.test keeps the SQLite file
+if (!is_dir(dirname(__DIR__) . DS . 'tmp')) {
+    mkdir(dirname(__DIR__) . DS . 'tmp', 0777, true);
+}
+
 // The tmp directory of the fixture application, where the router script keeps the cache of the web server
 if (!is_dir(__DIR__ . DS . 'test_app' . DS . 'tmp')) {
     mkdir(__DIR__ . DS . 'test_app' . DS . 'tmp', 0777, true);
