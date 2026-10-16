@@ -15,6 +15,12 @@ that the tests run with `APP_ENV=test` (no other `APP_ENV` in the environment), 
 `config/.env.test` (or in the real environment) is the test database, and that the test database is not an
 in-memory SQLite database.
 
+**The browser and the tests use different files (for example two SQLite databases)** — A relative path is
+resolved from the working directory. The CakePHP router script runs the web server in the working directory
+of the tests ([Relative Paths](test-database.md#relative-paths)); a router script of your own must change to
+`PANTHER_WORKING_DIR` too, and without a router script (`PANTHER_WEB_SERVER_ROUTER` empty) the web server runs
+in the document root. Run PHPUnit from the project root, or use absolute paths.
+
 **A variable does not reach the web server** — Set it in the shell, or in `$_ENV` or `$_SERVER`; a variable
 set only with `putenv()` is not passed.
 
@@ -33,4 +39,4 @@ wrong directory.
 
 **Logs of the web server** — CakePHP writes them to the usual `LOGS` directory. Requests and PHP errors of the
 built-in web server itself are not shown; start it by hand to see them:
-`php -S 127.0.0.1:9080 -t webroot vendor/pieceofcake2/panther/resources/router.php`.
+`PANTHER_WORKING_DIR=$PWD php -S 127.0.0.1:9080 -t webroot vendor/pieceofcake2/panther/resources/router.php`.

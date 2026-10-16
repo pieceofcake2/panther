@@ -221,11 +221,12 @@ PANTHER_NO_HEADLESS=1 vendor/bin/phpunit --testsuite EndToEnd --debug
 | `static createPantherClient(array $options = [], array $kernelOptions = [], array $managerOptions = [])` | ブラウザー。最初の呼び出しで Web サーバーとブラウザーを起動します (Panther) |
 | `static createAdditionalPantherClient()` | 別の独立したブラウザー (Panther) |
 | `static createHttpBrowserClient(array $options = [])` | HTTP を通して動く、JavaScript なしのクライアント (Panther) |
-| `static startWebServer(array $options = [])` | CakePHP 向けのデフォルトで Web サーバーを起動します。その後は Panther と同じ動作です |
+| `static startWebServer(array $options = [])` | CakePHP 向けのデフォルト (と `PANTHER_WORKING_DIR`) で Web サーバーを起動します。その後は Panther と同じ動作です |
 | `static stopWebServer()`、`static isWebServerStarted()` | Panther |
 | `static defaultWebServerDir(?string $projectRoot = null)` | プロジェクトの `webroot/` または `app/webroot/` (protected) |
 | `tearDown()` | `CakeTestCase::tearDown()` の後、失敗したテストのスクリーンショットを保存します |
 | `ROUTER` | CakePHP のルータースクリプトのパス |
+| `WORKING_DIR` | `PANTHER_WORKING_DIR`。テストの作業ディレクトリを Web サーバーに渡す変数 |
 | `CHROME`、`FIREFOX`、`SELENIUM` | `browser` オプションの値 |
 
 <a id="webtestassertionstrait"></a>

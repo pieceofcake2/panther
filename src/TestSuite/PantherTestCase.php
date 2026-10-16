@@ -44,6 +44,8 @@ use Throwable;
  *
  * - The web server directory defaults to `webroot/` (or `app/webroot/` for the legacy layout) of the project
  * - The web server router defaults to the CakePHP router script of this package (`resources/router.php`)
+ * - The web server gets the working directory of the tests (`PANTHER_WORKING_DIR`), where the router script
+ *   runs the application, so that relative paths point to the same files in the tests and in the web server
  * - The assertions of Panther's `WebTestAssertionsTrait`, without the Symfony FrameworkBundle
  *
  * Every other setting is Panther's: `PANTHER_WEB_SERVER_DIR`, `PANTHER_WEB_SERVER_PORT`,
@@ -65,6 +67,11 @@ abstract class PantherTestCase extends CakeTestCase
      * The CakePHP router script of the PHP built-in web server
      */
     public const ROUTER = __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'resources' . DIRECTORY_SEPARATOR . 'router.php';
+
+    /**
+     * The environment variable that gives the web server the working directory of the tests
+     */
+    public const WORKING_DIR = 'PANTHER_WORKING_DIR';
 
     /**
      * Takes a screenshot of the browsers when the test failed (`PANTHER_ERROR_SCREENSHOT_DIR`), like Panther.
@@ -222,6 +229,11 @@ abstract class PantherTestCase extends CakeTestCase
     /**
      * Starts the PHP built-in web server with the CakePHP defaults, then as Panther does.
      *
+     * The web server gets the working directory of the test process in `PANTHER_WORKING_DIR` (unless the `env`
+     * option sets it), and the CakePHP router script changes to it: the built-in web server runs PHP in the
+     * document root, the tests in the project root, so a relative path, such as an SQLite file of
+     * `DATABASE_URL`, would point to two different files.
+     *
      * @param array<string, mixed> $options See `PantherTestCaseTrait::$defaultOptions`
      * @return void
      */
@@ -231,6 +243,10 @@ abstract class PantherTestCase extends CakeTestCase
             $options['webServerDir'] = static::defaultWebServerDir();
         }
         $options['router'] ??= $_SERVER['PANTHER_WEB_SERVER_ROUTER'] ?? (realpath(static::ROUTER) ?: static::ROUTER);
+        $workingDir = getcwd();
+        if ($workingDir !== false) {
+            $options['env'] = (array)($options['env'] ?? []) + [self::WORKING_DIR => $workingDir];
+        }
 
         self::startPantherWebServer($options);
     }

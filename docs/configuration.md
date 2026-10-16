@@ -104,9 +104,23 @@ The default router script, `vendor/pieceofcake2/panther/resources/router.php`:
   detect the base path, also for URLs that look like files, such as `/articles.json`
 - keeps the cache of the web server (`CACHE`) in `tmp/cache/panther/`: the web server uses the test database
   as `default`, and must not use the model cache of your development server for it
+- changes to the working directory of the tests, which `PantherTestCase` passes to the web server as
+  `PANTHER_WORKING_DIR`: the built-in web server runs PHP in the document root, so a relative path would
+  point to another file than in the tests ([Relative Paths](test-database.md#relative-paths))
 
 For more, copy it into your application and set `PANTHER_WEB_SERVER_ROUTER` to the copy, relative to the
-document root, e.g. `../tests/router.php`.
+document root, e.g. `../tests/router.php`. `PANTHER_WORKING_DIR` is passed to your router script too, which can
+change to it the same way:
+
+```php
+$workingDir = getenv('PANTHER_WORKING_DIR');
+if (is_string($workingDir) && is_dir($workingDir)) {
+    chdir($workingDir);
+}
+```
+
+To run the web server in another directory, pass it with the `env` option, which wins over the working
+directory of the tests: `static::createPantherClient(['env' => ['PANTHER_WORKING_DIR' => $dir]])`.
 
 ### Modern and legacy layouts
 

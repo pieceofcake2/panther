@@ -15,6 +15,12 @@
 (または実際の環境変数) の `DATABASE_URL` がテスト用データベースであること、テスト用データベースがインメモリの
 SQLite データベースでないことを確認してください。
 
+**ブラウザーとテストが別のファイルを使う (たとえば 2 つの SQLite データベース)** — 相対パスは作業ディレクトリから
+解決されます。CakePHP のルータースクリプトは、テストの作業ディレクトリで Web サーバーを実行します
+([相対パス](test-database.md#relative-paths))。自分のルータースクリプトでも `PANTHER_WORKING_DIR` に移動する
+必要があり、ルータースクリプトがない場合 (`PANTHER_WEB_SERVER_ROUTER` が空) は、Web サーバーはドキュメントルートで
+動きます。PHPUnit はプロジェクトルートから実行するか、絶対パスを使ってください。
+
 **変数が Web サーバーに渡らない** — シェルで設定するか、`$_ENV` または `$_SERVER` に設定してください。
 `putenv()` だけで設定した変数は渡されません。
 
@@ -32,5 +38,5 @@ URL のようにシェルで別の値を設定していても、Web サーバー
 
 **Web サーバーのログ** — CakePHP は通常の `LOGS` ディレクトリにログを書き込みます。
 ビルトイン Web サーバー自体のリクエストと PHP のエラーは表示されません。それらを見るには、
-`php -S 127.0.0.1:9080 -t webroot vendor/pieceofcake2/panther/resources/router.php`
+`PANTHER_WORKING_DIR=$PWD php -S 127.0.0.1:9080 -t webroot vendor/pieceofcake2/panther/resources/router.php`
 で手動で起動してください。
