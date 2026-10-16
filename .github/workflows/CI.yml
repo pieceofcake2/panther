@@ -20,11 +20,14 @@ concurrency:
 
 permissions:
   contents: read
-  id-token: write
 
 jobs:
   phpunit:
     runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      id-token: write
 
     strategy:
       fail-fast: false
@@ -40,6 +43,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v7
+        with:
+          persist-credentials: false
 
       - name: Install PHP with extensions
         uses: shivammathur/setup-php@v2
@@ -85,6 +90,16 @@ jobs:
           file: junit-unit.xml
           coverage: coverage-unit.xml
 
+      - name: Upload the error screenshots
+        id: screenshots
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: error-screenshots-php${{ matrix.php-version }}
+          path: tmp/error-screenshots/
+          retention-days: 7
+          if-no-files-found: ignore
+
       - name: End-to-End test summary
         if: ${{ !cancelled() }}
         uses: pieceofcake2/ci-summary@v1
@@ -94,16 +109,8 @@ jobs:
           file: junit-end-to-end.xml
           coverage: coverage-end-to-end.xml
           artifact-name: error-screenshots-php${{ matrix.php-version }}
+          artifact-url: ${{ steps.screenshots.outputs.artifact-url }}
           artifact-note: Screenshots of the failed tests are in the {artifact} artifact.
-
-      - name: Upload the error screenshots
-        if: ${{ failure() }}
-        uses: actions/upload-artifact@v7
-        with:
-          name: error-screenshots-php${{ matrix.php-version }}
-          path: tmp/error-screenshots/
-          retention-days: 7
-          if-no-files-found: ignore
 
       - name: Upload test results to Codecov
         if: ${{ !cancelled() }}
@@ -136,6 +143,10 @@ jobs:
   qlty:
     runs-on: ubuntu-latest
 
+    permissions:
+      contents: read
+      id-token: write
+
     needs:
       - phpunit
 
@@ -150,6 +161,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -196,6 +209,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2

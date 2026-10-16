@@ -52,6 +52,10 @@ jobs:
       - name: Install chromedriver for the installed Chrome
         run: vendor/bin/bdi detect drivers
 
+      # The runners have no Japanese fonts; without them Japanese text is drawn as boxes in the screenshots
+      - name: Install Japanese fonts
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq fonts-noto-cjk
+
       - name: Run End-to-End tests
         env:
           DATABASE_TEST_URL: mysql://root:root@127.0.0.1:3306/test_app
@@ -59,6 +63,7 @@ jobs:
         run: vendor/bin/phpunit --testsuite EndToEnd --log-junit end-to-end-junit.xml
 
       - name: Upload the error screenshots
+        id: screenshots
         if: ${{ failure() }}
         uses: actions/upload-artifact@v7
         with:
@@ -75,12 +80,13 @@ jobs:
           title: End-to-End
           file: end-to-end-junit.xml
           artifact-name: error-screenshots
+          artifact-url: ${{ steps.screenshots.outputs.artifact-url }}
           artifact-note: Screenshots of the failed tests are in the {artifact} artifact.
 ```
 
 `bdi` は [dbrekelmans/bdi](https://github.com/dbrekelmans/bdi) です。
 `composer require --dev dbrekelmans/bdi` で追加してください。GitHub のランナーでは
-`PANTHER_NO_SANDBOX=1` が必要です。
+`PANTHER_NO_SANDBOX=1` が必要です。ランナーには日本語 (CJK) のフォントが無いので、例では `fonts-noto-cjk` を入れています。入れないと、スクリーンショットの日本語が四角 (豆腐) で表示されます。ページに CJK の文字が無ければ、このステップは不要です。
 `DATABASE_TEST_URL` は pieceofcake2/app の `config/database.php` の `test` 接続を設定し (pieceofcake2/cakephp 2.12.7
 以降が必要です)、Web サーバーはそれを `default` として使います。
 [テスト用データベース](test-database.md) をご覧ください。
