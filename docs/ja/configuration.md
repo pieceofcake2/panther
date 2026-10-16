@@ -15,8 +15,6 @@ End-to-End テストは Symfony Panther と同じように、`PANTHER_*` 環境�
     <php>
         <!-- The web server uses the test datasource, where the fixtures are -->
         <server name="PANTHER_APP_ENV" value="test"/>
-        <!-- Screenshots of the failed End-to-End tests -->
-        <server name="PANTHER_ERROR_SCREENSHOT_DIR" value="./tmp/error-screenshots"/>
     </php>
     <extensions>
         <extension class="PieceOfCake2\Panther\ServerExtension"/>

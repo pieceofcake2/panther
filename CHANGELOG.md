@@ -11,7 +11,9 @@
   viewport scrolled to an element, what fits on a page of the report, or the whole page in parts of the same
   height. A test that takes none gets the screenshot of its end, and a failed test the screenshot of its failure,
   taken before `tearDown()`
-- CI example (docs): the job uploads the report as a PDF, not a zip (`archive: false` of actions/upload-artifact)
+- CI example (docs): the job uploads the report as a PDF, not a zip (`archive: false` of actions/upload-artifact),
+  and its summary links to it. The examples no longer set `PANTHER_ERROR_SCREENSHOT_DIR`: the report has the
+  screenshots of all the tests
 
 ## 1.0.1
 

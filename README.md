@@ -78,7 +78,6 @@ It is a library (PSR-4, `PieceOfCake2\Panther\`), not a CakePHP plugin: there is
    ```xml
    <php>
        <server name="PANTHER_APP_ENV" value="test"/>
-       <server name="PANTHER_ERROR_SCREENSHOT_DIR" value="./tmp/error-screenshots"/>
    </php>
    <extensions>
        <extension class="PieceOfCake2\Panther\ServerExtension"/>

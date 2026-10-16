@@ -61,7 +61,6 @@ Add `/drivers/` to `.gitignore`.
    ```xml
    <php>
        <server name="PANTHER_APP_ENV" value="test"/>
-       <server name="PANTHER_ERROR_SCREENSHOT_DIR" value="./tmp/error-screenshots"/>
    </php>
    <extensions>
        <extension class="PieceOfCake2\Panther\ServerExtension"/>

@@ -10,7 +10,6 @@
         <!-- Symfony Panther and pieceofcake2/panther read these from $_SERVER -->
         <server name="PANTHER_WEB_SERVER_DIR" value="./tests/test_app/webroot"/>
         <server name="PANTHER_APP_ENV" value="test"/>
-        <server name="PANTHER_ERROR_SCREENSHOT_DIR" value="./tmp/error-screenshots"/>
     </php>
     <extensions>
         <extension class="PieceOfCake2\Panther\ServerExtension"/>

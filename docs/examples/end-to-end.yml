@@ -60,6 +60,7 @@ jobs:
 
       # The test report of every run, passed or not; one file is uploaded as it is, without a zip
       - name: Upload the test report
+        id: report
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v7
         with:
@@ -68,16 +69,6 @@ jobs:
           retention-days: 30
           if-no-files-found: error
 
-      - name: Upload the error screenshots
-        id: screenshots
-        if: ${{ failure() }}
-        uses: actions/upload-artifact@v7
-        with:
-          name: error-screenshots
-          path: tmp/error-screenshots/
-          retention-days: 7
-          if-no-files-found: ignore
-
       - name: End-to-End summary
         if: ${{ !cancelled() }}
         uses: pieceofcake2/ci-summary@v1
@@ -85,6 +76,6 @@ jobs:
           type: junit
           title: End-to-End
           file: end-to-end-junit.xml
-          artifact-name: error-screenshots
-          artifact-url: ${{ steps.screenshots.outputs.artifact-url }}
-          artifact-note: Screenshots of the failed tests are in the {artifact} artifact.
+          artifact-name: end-to-end-report.pdf
+          artifact-url: ${{ steps.report.outputs.artifact-url }}
+          artifact-note: The test report is {artifact}.

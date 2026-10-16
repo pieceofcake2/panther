@@ -1,8 +1,8 @@
 # CI with GitHub Actions
 
 The runner image of `ubuntu-latest` has Chrome and a matching chromedriver; `vendor/bin/bdi detect drivers`
-makes sure. Run the End-to-End tests in a job of their own, upload the screenshots when it fails, and add a
-[job summary](https://github.com/pieceofcake2/ci-summary#readme) that links to them
+makes sure. Run the End-to-End tests in a job of their own, upload their [test report](report.md), and add a
+[job summary](https://github.com/pieceofcake2/ci-summary#readme) that links to it
 ([docs/examples/end-to-end.yml](examples/end-to-end.yml)):
 
 ```yaml
@@ -68,6 +68,7 @@ jobs:
 
       # The test report of every run, passed or not; one file is uploaded as it is, without a zip
       - name: Upload the test report
+        id: report
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v7
         with:
@@ -76,16 +77,6 @@ jobs:
           retention-days: 30
           if-no-files-found: error
 
-      - name: Upload the error screenshots
-        id: screenshots
-        if: ${{ failure() }}
-        uses: actions/upload-artifact@v7
-        with:
-          name: error-screenshots
-          path: tmp/error-screenshots/
-          retention-days: 7
-          if-no-files-found: ignore
-
       - name: End-to-End summary
         if: ${{ !cancelled() }}
         uses: pieceofcake2/ci-summary@v1
@@ -93,9 +84,9 @@ jobs:
           type: junit
           title: End-to-End
           file: end-to-end-junit.xml
-          artifact-name: error-screenshots
-          artifact-url: ${{ steps.screenshots.outputs.artifact-url }}
-          artifact-note: Screenshots of the failed tests are in the {artifact} artifact.
+          artifact-name: end-to-end-report.pdf
+          artifact-url: ${{ steps.report.outputs.artifact-url }}
+          artifact-note: The test report is {artifact}.
 ```
 
 `PANTHER_REPORT_PDF` writes the [test report](report.md) of the run, and the next step uploads it: with

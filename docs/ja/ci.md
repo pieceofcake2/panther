@@ -1,8 +1,8 @@
 # GitHub Actions での CI
 
 `ubuntu-latest` のランナーイメージには Chrome と、それに合った chromedriver が含まれています。
-`vendor/bin/bdi detect drivers` で確実に合わせます。End-to-End テストは専用のジョブで実行し、失敗した
-ときはスクリーンショットをアップロードして、それへのリンクを含む
+`vendor/bin/bdi detect drivers` で確実に合わせます。End-to-End テストは専用のジョブで実行し、
+[テスト報告書](report.md) をアップロードして、それへのリンクを含む
 [ジョブサマリー](https://github.com/pieceofcake2/ci-summary#readme) を追加します
 ([docs/examples/end-to-end.yml](../examples/end-to-end.yml))。
 
@@ -69,6 +69,7 @@ jobs:
 
       # The test report of every run, passed or not; one file is uploaded as it is, without a zip
       - name: Upload the test report
+        id: report
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v7
         with:
@@ -77,16 +78,6 @@ jobs:
           retention-days: 30
           if-no-files-found: error
 
-      - name: Upload the error screenshots
-        id: screenshots
-        if: ${{ failure() }}
-        uses: actions/upload-artifact@v7
-        with:
-          name: error-screenshots
-          path: tmp/error-screenshots/
-          retention-days: 7
-          if-no-files-found: ignore
-
       - name: End-to-End summary
         if: ${{ !cancelled() }}
         uses: pieceofcake2/ci-summary@v1
@@ -94,9 +85,9 @@ jobs:
           type: junit
           title: End-to-End
           file: end-to-end-junit.xml
-          artifact-name: error-screenshots
-          artifact-url: ${{ steps.screenshots.outputs.artifact-url }}
-          artifact-note: Screenshots of the failed tests are in the {artifact} artifact.
+          artifact-name: end-to-end-report.pdf
+          artifact-url: ${{ steps.report.outputs.artifact-url }}
+          artifact-note: The test report is {artifact}.
 ```
 
 `PANTHER_REPORT_PDF` で実行の[テスト報告書](report.md)を書き出し、次のステップでアップロードします。
