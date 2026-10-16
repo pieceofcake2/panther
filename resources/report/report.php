@@ -80,10 +80,12 @@
 <section class="list">
 <h2><?= $h($t('section.tests')) ?></h2>
 <?php foreach ($view['groups'] as $group) : ?>
+    <div class="group-list">
     <h3><?= (int)$group['no'] ?>. <?= $h($group['title']) ?></h3>
     <table>
     <colgroup><col class="no"><col><col class="res"><col class="time"></colgroup>
-    <tr><th><?= $h($t('field.no')) ?></th><th><?= $h($t('field.test')) ?></th><th><?= $h($t('field.result')) ?></th><th><?= $h($t('field.time')) ?></th></tr>
+    <thead><tr><th><?= $h($t('field.no')) ?></th><th><?= $h($t('field.test')) ?></th><th><?= $h($t('field.result')) ?></th><th><?= $h($t('field.time')) ?></th></tr></thead>
+    <tbody>
     <?php foreach ($group['tests'] as $test) : ?>
         <tr>
         <td><?= $h($test['no']) ?></td>
@@ -92,7 +94,9 @@
         <td class="num"><?= $h($test['time']) ?></td>
         </tr>
     <?php endforeach; ?>
+    </tbody>
     </table>
+    </div>
 <?php endforeach; ?>
 </section>
 
@@ -117,15 +121,17 @@
         <?php if ($test['steps'] !== []) : ?>
             <div class="shots">
             <?php foreach ($test['steps'] as $step) : ?>
+                <div class="step">
                 <?php foreach ($step['images'] as $image) : ?>
                     <figure class="<?= $h($image['class']) ?>">
                     <img src="<?= $h(rawurlencode($image['file'])) ?>" alt="" style="<?= $h($image['style']) ?>">
                     <figcaption>
-                    <span class="step"><?= $h($step['label']) ?></span>
+                    <span class="name"><?= $h($step['label']) ?></span>
                     <span class="kind"><?= $h($image['mode']) ?></span><span class="path"><?= $h($image['path']) ?></span><span class="page-title"><?= $h($image['title']) ?></span>
                     </figcaption>
                     </figure>
                 <?php endforeach; ?>
+                </div>
             <?php endforeach; ?>
             </div>
         <?php endif; ?>

@@ -105,11 +105,14 @@ class HtmlRendererTest extends TestCase
         $this->assertStringContainsString('1.8s', $html);
 
         // The steps and their captions; a full page keeps the scale of the report
-        $this->assertStringContainsString('<span class="step">1. Search form</span>', $html);
+        $this->assertStringContainsString('<span class="name">1. Search form</span>', $html);
         $this->assertStringContainsString('<span class="kind">Viewport 1366×768</span><span class="path">/career/</span><span class="page-title">Careers &lt;Hilton&gt;</span>', $html);
         $this->assertStringContainsString('<span class="kind">Full page 2/2</span>', $html);
         $this->assertStringContainsString('style="width: 180.0mm"', $html);
-        $this->assertStringContainsString('<span class="step">At the failure</span>', $html);
+        $this->assertStringContainsString('<span class="name">At the failure</span>', $html);
+        // The images of a step are together, and the list repeats its header on each page
+        $this->assertSame(3, substr_count($html, '<div class="step">'));
+        $this->assertStringContainsString('<thead><tr><th>No.</th>', $html);
         $this->assertStringContainsString('<figure class="portrait">', $html);
 
         // The failure, escaped, with its file and line; the description of the test
@@ -128,7 +131,7 @@ class HtmlRendererTest extends TestCase
         $this->assertStringContainsString('<h1>受入テスト報告書</h1>', $html);
         $this->assertStringContainsString('<div class="label">不合格</div>', $html);
         $this->assertStringContainsString('Lists the jobs（データ: career）', $html);
-        $this->assertStringContainsString('<span class="step">失敗した時点の画面</span>', $html);
+        $this->assertStringContainsString('<span class="name">失敗した時点の画面</span>', $html);
         $this->assertStringContainsString('<b>失敗の内容</b>', $html);
         // The modes of the screenshots are not translated
         $this->assertStringContainsString('<span class="kind">Viewport 390×844</span>', $html);

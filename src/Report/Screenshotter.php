@@ -14,13 +14,14 @@ use Symfony\Component\Panther\Client;
  *
  * With Chrome, the screenshots are taken with the DevTools Protocol as JPEG images of 1 pixel per CSS pixel, so
  * that a page of a mobile emulation (`deviceScaleFactor` of 3) is not 9 times as large, and a full page is taken
- * in parts of `PART_HEIGHT` CSS pixels, one part per page of the report. With another browser, they are the PNG
+ * in parts of the same height, at most `PART_HEIGHT` CSS pixels, so that a part fits on a page of the report. With another browser, they are the PNG
  * screenshots of WebDriver, of the viewport.
  */
 final class Screenshotter
 {
     /**
-     * The height of a part of a full page (CSS pixels): about a page of A4 at the scale of the report
+     * The most height of a part of a full page (CSS pixels): about a page of A4 at the scale of the report.
+     * A page is split into parts of the same height, so that the last part is not a sliver
      */
     public const PART_HEIGHT = 1500;
 
@@ -165,10 +166,12 @@ final class Screenshotter
         }
 
         $images = [];
-        $parts = min(self::MAX_PARTS, (int)ceil($height / self::PART_HEIGHT));
-        for ($part = 0; $part < $parts; $part++) {
-            $y = $part * self::PART_HEIGHT;
-            $clip = ['x' => 0, 'y' => $y, 'width' => $width, 'height' => min(self::PART_HEIGHT, $height - $y)];
+        $parts = (int)ceil($height / self::PART_HEIGHT);
+        $partHeight = (int)ceil($height / $parts);
+        $taken = min($parts, self::MAX_PARTS);
+        for ($part = 0; $part < $taken; $part++) {
+            $y = $part * $partHeight;
+            $clip = ['x' => 0, 'y' => $y, 'width' => $width, 'height' => min($partHeight, $height - $y)];
             $images[] = ['jpg', $this->capture($devTools, $clip)];
         }
 

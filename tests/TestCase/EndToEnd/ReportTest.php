@@ -127,11 +127,11 @@ class ReportTest extends PantherTestCase
             [3, 'Whole page', 'Full page', 4, 4],
         ], $steps);
 
-        // The parts of a full page of 5000 pixels: 1500, 1500, 1500 and 500 pixels high, as wide as the page
+        // The parts of a full page of 5000 pixels: 4 parts of 1250 pixels, as wide as the page
         // (the viewport without its scroll bar, which takes 15 pixels on Linux)
         $sizes = array_map(static fn(Screenshot $screenshot): array => self::imageSize($recorder, $screenshot), array_slice($result->screenshots, 2));
         $width = $sizes[0][0];
-        $this->assertSame([[$width, 1500], [$width, 1500], [$width, 1500], [$width, 500]], $sizes);
+        $this->assertSame([[$width, 1250], [$width, 1250], [$width, 1250], [$width, 1250]], $sizes);
         $this->assertLessThanOrEqual($result->screenshots[2]->viewportWidth, $width);
         $this->assertGreaterThan($result->screenshots[2]->viewportWidth - 30, $width);
     }
