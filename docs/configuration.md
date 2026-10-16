@@ -5,14 +5,12 @@ options of `createPantherClient()`.
 
 ## phpunit.xml.dist
 
-Register the extension, set the datasource of the web server and add an `EndToEnd` suite
+Register the extension and add an `EndToEnd` suite
 ([docs/examples/phpunit.xml.dist](examples/phpunit.xml.dist)):
 
 ```xml
 <phpunit bootstrap="./tests/bootstrap.php" defaultTestSuite="App">
     <php>
-        <!-- The web server uses the test datasource, where the fixtures are -->
-        <server name="PANTHER_APP_ENV" value="test"/>
         <!-- Screenshots of the failed End-to-End tests -->
         <server name="PANTHER_ERROR_SCREENSHOT_DIR" value="./tmp/error-screenshots"/>
     </php>
@@ -33,6 +31,10 @@ Register the extension, set the datasource of the web server and add an `EndToEn
     </testsuites>
 </phpunit>
 ```
+
+The tests of pieceofcake2/app run with `APP_ENV=test` by default (`tests/bootstrap.php` sets it before
+CakePHP loads the `.env` files when it is not set), so the tests load `config/.env.test`, and the web server inherits it and loads the same file
+([Test Database](test-database.md#the-test-environment)).
 
 Like Panther, the package reads its settings from `$_SERVER`, so they are `<server>` elements, as in the
 Symfony documentation. A variable of your shell is in `$_SERVER` too, but a `<server>` element replaces it:
@@ -65,7 +67,7 @@ or with `<server>` in `phpunit.xml.dist`.
 | `PANTHER_WEB_SERVER_ROUTER` | Router script, relative to the document root. Default: the [CakePHP router script](#the-cakephp-router-script); empty for none |
 | `PANTHER_READINESS_PATH` | Path requested to check that the web server has started. Default `/` |
 | `PANTHER_EXTERNAL_BASE_URI` | Test an application that is already running at this URL; no web server is started |
-| `PANTHER_APP_ENV` | Passed as `APP_ENV` to the web server. Set it to `test` so that `config/database.php` uses the test datasource |
+| `PANTHER_APP_ENV` | Passed as `APP_ENV` to the web server. Only needed to give the web server a different `APP_ENV` than the tests; without it, the web server inherits `APP_ENV` of the tests |
 | `PANTHER_ERROR_SCREENSHOT_DIR` | Directory for the screenshots of failed tests, e.g. `./tmp/error-screenshots` |
 | `PANTHER_ERROR_SCREENSHOT_ATTACH` | Print the screenshots in the JUnit attachment format |
 | `PANTHER_NO_HEADLESS` | Show the browser window |

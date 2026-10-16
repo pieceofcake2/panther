@@ -11,8 +11,9 @@
 の場合は、`$managerOptions` で別の `port` を渡してください。
 
 **ブラウザーに `Missing Database Table` と表示される** — Web サーバーがテスト用データソースを
-使っていません。`phpunit.xml.dist` の `PANTHER_APP_ENV` と `config/database.php` の `APP_ENV` の行を確認し、
-テスト用データソースがインメモリの SQLite データベースでないことを確認してください。
+使っていません。テストが `APP_ENV=test` で動いていること (環境変数にほかの `APP_ENV` が無いこと)、`config/.env.test`
+(または実際の環境変数) の `DATABASE_URL` がテスト用データベースであること、テスト用データベースがインメモリの
+SQLite データベースでないことを確認してください。
 
 **変数が Web サーバーに渡らない** — シェルで設定するか、`$_ENV` または `$_SERVER` に設定してください。
 `putenv()` だけで設定した変数は渡されません。
@@ -21,7 +22,7 @@
 `getenv()` から作られます。テストが `.env` ファイルを `$_ENV` に読み込み (たとえば josegonzalez/dotenv の `toEnv()`)、
 PHP 自身が `$_ENV` を埋めない場合 (GitHub のランナーのように `variables_order` に `E` が無い場合)、CI のテスト用 DB の
 URL のようにシェルで別の値を設定していても、Web サーバーには `.env` の値が渡ります。このような値は `env` オプションで渡して
-ください: `static::createPantherClient(['env' => ['DATABASE_TEST_URL' => (string)env('DATABASE_TEST_URL')]])`。
+ください: `static::createPantherClient(['env' => ['DATABASE_URL' => (string)env('DATABASE_URL')]])`。
 
 **スクリーンショットの日本語が四角 (豆腐) で表示される** — GitHub のランナーのように、日本語 (CJK) のフォントが
 入っていません。たとえば `sudo apt-get install -y fonts-noto-cjk` で入れてください ([CI](ci.md) をご覧ください)。

@@ -24,7 +24,7 @@ its `PantherTestCase` starts the application with PHP's built-in web server and 
 | The assertions of `WebTestAssertionsTrait` | `PieceOfCake2\Panther\TestSuite\WebTestAssertionsTrait`, the same assertions without the Symfony FrameworkBundle |
 | `PANTHER_WEB_SERVER_DIR` defaults to `public/` | defaults to `webroot/` (or `app/webroot/`) |
 | `PANTHER_WEB_SERVER_ROUTER` defaults to none | defaults to the [CakePHP router script](configuration.md#the-cakephp-router-script) |
-| `PANTHER_APP_ENV=test` makes the web server load `.env.test` | `PANTHER_APP_ENV=test` makes `config/database.php` use the `test` datasource |
+| `APP_ENV=test` of `phpunit.xml.dist` makes the tests and the web server load `.env.test` | the same, with `config/.env.test` of pieceofcake2/app; its tests run with `APP_ENV=test` by default |
 
 Everything else is Panther's own: the `Client` (`request()`, `clickLink()`, `submitForm()`, `waitFor()`,
 `takeScreenshot()` ...), `createPantherClient()` and its options, and the `PANTHER_*` environment variables.
@@ -55,12 +55,11 @@ Add `/drivers/` to `.gitignore`.
 
 ## Quick Start
 
-1. Register the extension and set the datasource of the web server in `phpunit.xml.dist`
+1. Register the extension in `phpunit.xml.dist`
    ([Configuration](configuration.md#phpunitxmldist)):
 
    ```xml
    <php>
-       <server name="PANTHER_APP_ENV" value="test"/>
        <server name="PANTHER_ERROR_SCREENSHOT_DIR" value="./tmp/error-screenshots"/>
    </php>
    <extensions>
@@ -68,8 +67,8 @@ Add `/drivers/` to `.gitignore`.
    </extensions>
    ```
 
-2. Make `config/database.php` use that datasource as `default` in the web server
-   ([Test Database](test-database.md#the-databasephp-switch)).
+2. Set `DATABASE_URL` to the test database in `config/.env.test`, which the tests and the web server load
+   with `APP_ENV=test`, the default of the tests ([Test Database](test-database.md#the-test-environment)).
 3. Write tests that extend `PieceOfCake2\Panther\TestSuite\PantherTestCase` in `tests/TestCase/EndToEnd/`
    ([Writing Tests](writing-tests.md)).
 4. Run them:

@@ -72,12 +72,11 @@ It is a library (PSR-4, `PieceOfCake2\Panther\`), not a CakePHP plugin: there is
 
 ## Quick start
 
-1. Register the extension and set the datasource of the web server in `phpunit.xml.dist`
+1. Register the extension in `phpunit.xml.dist`
    (see [docs/examples/phpunit.xml.dist](docs/examples/phpunit.xml.dist)):
 
    ```xml
    <php>
-       <server name="PANTHER_APP_ENV" value="test"/>
        <server name="PANTHER_ERROR_SCREENSHOT_DIR" value="./tmp/error-screenshots"/>
    </php>
    <extensions>
@@ -85,13 +84,13 @@ It is a library (PSR-4, `PieceOfCake2\Panther\`), not a CakePHP plugin: there is
    </extensions>
    ```
 
-2. Make `config/database.php` use the `test` datasource as `default` when `APP_ENV` is `test`, which
-   Panther sets in the web server from `PANTHER_APP_ENV` (pieceofcake2/app's `database.php.default` does):
+2. Set `DATABASE_URL` to the test database in `config/.env.test`. The tests run with `APP_ENV=test` by
+   default (pieceofcake2/app's `tests/bootstrap.php`), and the web server inherits it, so both load that file, as in Symfony
+   (pieceofcake2/app has this setup; see [Test Database](docs/test-database.md)):
 
-   ```php
-   if (env('APP_ENV') === 'test') {
-       $this->default = $this->test;
-   }
+   ```dotenv
+   # config/.env.test
+   DATABASE_URL="mysql://user:password@localhost:3306/test_database_name?encoding=utf8mb4"
    ```
 
 3. Write tests that extend `PieceOfCake2\Panther\TestSuite\PantherTestCase` in `tests/TestCase/EndToEnd/`
