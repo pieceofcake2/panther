@@ -37,8 +37,9 @@ PANTHER_REPORT_PDF=tmp/end-to-end-report.pdf vendor/bin/phpunit --testsuite EndT
 ## 必要なもの
 
 - 拡張 `PieceOfCake2\Panther\ServerExtension` ([設定](configuration.md#phpunitxmldist))
-- PDF を作るための Chrome と chromedriver (テストと同じもの)。報告書は、テストのブラウザが何であっても、
-  別に起動したヘッドレスの Chrome で作ります
+- PDF を作るための Chrome。報告書は、テストのブラウザが何であっても、[pieceofcake2/report](https://pieceofcake2.github.io/report/ja/)
+  で、別に起動したヘッドレスの Chrome のコマンドラインで印刷します (`PANTHER_CHROME_BINARY`、`PANTHER_NO_SANDBOX`)。
+  chromedriver は使いません
 - ヘッダーとページ番号には Chrome 131 以降 (CSS のページのマージンボックス)
 - ページと報告書の言語のフォント。Linux で日本語を使うなら `fonts-noto-cjk` ([CI](ci.md))
 
@@ -189,9 +190,10 @@ Git から取れない値は載せません。
 
 ## 言語
 
-英語 (`en`) と日本語 (`ja`) を `resources/report/locales/` に同梱しています。ほかの言語や別の言い回しにするには、
-[`en.json`](../../resources/report/locales/en.json) と同じキーの `<言語>.json` を `PANTHER_REPORT_LOCALE_DIR` に
-置きます。無いキーは英語になります。
+英語 (`en`) と日本語 (`ja`) を同梱しています。テストの報告書のメッセージは `resources/report/locales/` に、共通の
+メッセージは pieceofcake2/report (`vendor/pieceofcake2/report/resources/locales/`) にあります。ほかの言語や別の言い回しに
+するには、両方の [`en.json`](../../resources/report/locales/en.json) と同じキーの `<言語>.json` を
+`PANTHER_REPORT_LOCALE_DIR` に置きます。無いキーは英語になります。
 
 ```json
 {

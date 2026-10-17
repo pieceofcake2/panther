@@ -1,5 +1,15 @@
 # CHANGELOG
 
+## Unreleased
+
+- The test report is written with [pieceofcake2/report](https://github.com/pieceofcake2/report), the report of this
+  package moved to a package of its own for other tools. The PDF looks the same. It is printed by the command line
+  of a headless Chrome instead of chromedriver; `PANTHER_CHROME_BINARY` and `PANTHER_NO_SANDBOX` still apply.
+  The common messages (`verdict.*`, `field.date`, ...) are now those of pieceofcake2/report; a
+  `PANTHER_REPORT_LOCALE_DIR` file may still replace them
+- `PieceOfCake2\Panther\Report\Environment`, `PdfPrinter` and `Translator` are removed: use the classes of the
+  same names in `PieceOfCake2\Report\`
+
 ## 1.0.4
 
 - `PantherTestCase::startWebServer()` uses `$defaultOptions['env']` again when the `env` option is not given.
