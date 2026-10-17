@@ -32,8 +32,9 @@ steps, a full page, a phone, a data provider, and a test that fails and one that
 ## Requirements
 
 - The extension, `PieceOfCake2\Panther\ServerExtension` ([Configuration](configuration.md#phpunitxmldist))
-- Chrome and its chromedriver to print the PDF, as for the tests. The report is printed by a Chrome of its own,
-  headless, whatever the browser of the tests is
+- Chrome to print the PDF. The report is printed with [pieceofcake2/report](https://pieceofcake2.github.io/report/)
+  by the command line of a headless Chrome of its own (`PANTHER_CHROME_BINARY`, `PANTHER_NO_SANDBOX`), whatever
+  the browser of the tests is; it needs no chromedriver
 - Chrome 131+ for the header and the page numbers (CSS page margin boxes)
 - Fonts of the languages of the pages and of the report: on Linux, `fonts-noto-cjk` for Japanese
   ([CI](ci.md))
@@ -172,9 +173,10 @@ exists in CI, e.g. with `if-no-files-found: error` of `actions/upload-artifact` 
 
 ## Languages
 
-English (`en`) and Japanese (`ja`) are bundled, in `resources/report/locales/`. For another language, or other
-words, put a `<language>.json` file in `PANTHER_REPORT_LOCALE_DIR` with the messages of
-[`en.json`](../resources/report/locales/en.json); a message that it does not have is the English one:
+English (`en`) and Japanese (`ja`) are bundled: the messages of the test report in `resources/report/locales/`,
+and the common ones of pieceofcake2/report (`vendor/pieceofcake2/report/resources/locales/`). For another
+language, or other words, put a `<language>.json` file in `PANTHER_REPORT_LOCALE_DIR` with messages of both
+[`en.json`](../resources/report/locales/en.json) files; a message that it does not have is the English one:
 
 ```json
 {

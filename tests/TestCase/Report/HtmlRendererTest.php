@@ -5,12 +5,11 @@ namespace PieceOfCake2\Panther\Test\Report;
 
 use PHPUnit\Framework\TestCase;
 use PieceOfCake2\Panther\Report\Config;
-use PieceOfCake2\Panther\Report\Environment;
 use PieceOfCake2\Panther\Report\HtmlRenderer;
 use PieceOfCake2\Panther\Report\Recorder;
 use PieceOfCake2\Panther\Report\Screenshot;
 use PieceOfCake2\Panther\Report\TestResult;
-use PieceOfCake2\Panther\Report\Translator;
+use PieceOfCake2\Report\Environment;
 
 class HtmlRendererTest extends TestCase
 {
@@ -86,14 +85,14 @@ class HtmlRendererTest extends TestCase
     {
         $config = new Config('report.pdf', 'en', null, null, 'Acme app', 'Fictitious data.');
 
-        $html = (new HtmlRenderer(new Translator()))->render($this->recorder($config), self::environment());
+        $html = (new HtmlRenderer(HtmlRenderer::translator(new Config('report.pdf'))))->render($this->recorder($config), self::environment());
 
         $this->assertStringContainsString('<html lang="en">', $html);
         $this->assertStringContainsString('<h1>End-to-End Test Report</h1>', $html);
         $this->assertStringContainsString('<div class="project">Acme app</div>', $html);
         $this->assertStringContainsString('<div class="verdict failed">', $html);
         $this->assertStringContainsString('<div class="label">FAILED</div>', $html);
-        $this->assertMatchesRegularExpression('#<b>3</b><span>Tests</span>.*<b class="t-pass">1</b><span>Passed</span>.*<b class="t-fail">1</b><span>Failed</span>.*<b class="">0</b><span>Errors</span>.*<b>1</b><span>Skipped</span>#s', $html);
+        $this->assertMatchesRegularExpression('#<b class="">3</b><span>Tests</span>.*<b class="t-pass">1</b><span>Passed</span>.*<b class="t-fail">1</b><span>Failed</span>.*<b class="">0</b><span>Errors</span>.*<b class="">1</b><span>Skipped</span>#s', $html);
         $this->assertStringContainsString('feat: add &quot;the&quot; report', $html);
         $this->assertStringContainsString('https://github.com/acme/app/actions/runs/99', $html);
         $this->assertStringContainsString('<p class="note">Fictitious data.</p>', $html);
@@ -133,7 +132,7 @@ class HtmlRendererTest extends TestCase
     {
         $config = new Config('report.pdf', 'ja', null, '受入テスト報告書');
 
-        $html = (new HtmlRenderer(new Translator('ja')))->render($this->recorder($config), self::environment());
+        $html = (new HtmlRenderer(HtmlRenderer::translator($config)))->render($this->recorder($config), self::environment());
 
         $this->assertStringContainsString('<html lang="ja">', $html);
         $this->assertStringContainsString('<h1>受入テスト報告書</h1>', $html);
@@ -156,7 +155,7 @@ class HtmlRendererTest extends TestCase
         $environment->dirty = true;
         $environment->os = 'macOS 15.1 arm64';
 
-        $html = (new HtmlRenderer(new Translator()))->render($recorder, $environment);
+        $html = (new HtmlRenderer(HtmlRenderer::translator(new Config('report.pdf'))))->render($recorder, $environment);
 
         $this->assertStringContainsString('<div class="verdict passed">', $html);
         $this->assertStringContainsString('<div class="label">PASSED</div>', $html);
@@ -170,9 +169,36 @@ class HtmlRendererTest extends TestCase
     {
         $config = new Config('report.pdf', 'en', null, 'Report "1" \\ </style>');
 
-        $html = (new HtmlRenderer(new Translator()))->render($this->recorder($config), self::environment());
+        $html = (new HtmlRenderer(HtmlRenderer::translator(new Config('report.pdf'))))->render($this->recorder($config), self::environment());
 
         $this->assertStringContainsString('@top-left { content: "Report \\22 1\\22  \\5C  \\3C /style\\3E 　', $html);
         $this->assertSame(1, substr_count($html, '</style>'));
+    }
+
+    public function testBundledLanguagesHaveTheSameMessages(): void
+    {
+        $en = json_decode((string)file_get_contents(HtmlRenderer::LOCALE_DIR . DS . 'en.json'), true);
+        $ja = json_decode((string)file_get_contents(HtmlRenderer::LOCALE_DIR . DS . 'ja.json'), true);
+
+        $this->assertIsArray($en);
+        $this->assertIsArray($ja);
+        $this->assertSame(array_keys($en), array_keys($ja));
+    }
+
+    public function testLocaleDirReplacesMessages(): void
+    {
+        $dir = TMP . 'locales-' . bin2hex(random_bytes(4));
+        mkdir($dir);
+        file_put_contents($dir . DS . 'ja.json', json_encode(['title' => '受入テスト報告書']));
+        try {
+            $translator = HtmlRenderer::translator(new Config('report.pdf', 'ja', $dir));
+
+            $this->assertSame('受入テスト報告書', $translator->translate('title'));
+            $this->assertSame('成功', $translator->translate('count.passed'));
+            $this->assertSame('合格', $translator->translate('verdict.passed'));
+        } finally {
+            unlink($dir . DS . 'ja.json');
+            rmdir($dir);
+        }
     }
 }

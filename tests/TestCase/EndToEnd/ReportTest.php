@@ -5,12 +5,12 @@ namespace PieceOfCake2\Panther\Test\EndToEnd;
 
 use FilesystemIterator;
 use PieceOfCake2\Panther\Report\Config;
-use PieceOfCake2\Panther\Report\Environment;
 use PieceOfCake2\Panther\Report\Recorder;
 use PieceOfCake2\Panther\Report\ReportWriter;
 use PieceOfCake2\Panther\Report\Screenshot;
 use PieceOfCake2\Panther\Report\TestResult;
 use PieceOfCake2\Panther\TestSuite\PantherTestCase;
+use PieceOfCake2\Report\Environment;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 
