@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## Unreleased
+## 1.0.5
 
 - The test report is written with [pieceofcake2/report](https://github.com/pieceofcake2/report), the report of this
   package moved to a package of its own for other tools. The PDF looks the same. It is printed by the command line
